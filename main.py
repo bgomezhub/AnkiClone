@@ -1,4 +1,5 @@
 from tkinter import *
+from math import floor
 
 root = Tk()
 
@@ -16,13 +17,17 @@ def define_conjugation_table():
     return con_list
 
 
+def display_conjugation_table(conjugation_table):
+    i = 0
+    while i < len(conjugation_table) - 1:
+        for row in range(7):
+            for column in range(2):
+                conjugation_table[i].grid(column=column, row=row)
+                i += 1
+
+
+# Define & Display conjugation table
 conjugation_table = define_conjugation_table()
-# Display conjugation table
-i = 0
-while i < len(conjugation_table) - 1:
-    for row in range(7):
-        for column in range(2):
-            conjugation_table[i].grid(column=column, row=row)
-            i += 1
+display_conjugation_table(conjugation_table)
 
 root.mainloop()
