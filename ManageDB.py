@@ -15,6 +15,7 @@ class ManageDB:
     def __init__(self):
         # Define the page
         self.root = Tk()
+        self.r_frame = Frame(self.root)
         self.conjugation_table = []
         self.db_manager()
 
@@ -39,8 +40,7 @@ class ManageDB:
                 self.conjugation_table[num].grid(column=1, row=num//2)
 
     def recent(self):
-        r_frame = Frame(self.root)
-        r_frame.grid(column=0, columnspan=2, row=9)
+        self.r_frame.grid(column=0, columnspan=2, row=9)
         # Connect to database
         conn = sqlite3.connect('en_fr_words.db')
         # Create cursor
@@ -50,8 +50,7 @@ class ManageDB:
         # Show recent inputs
         records = c.fetchmany(5)
         for record in records:
-            Label(r_frame, text=record, pady=5, padx=5).grid(column=0, row=0)
-            print(record)
+            Label(self.r_frame, text=record, pady=5, padx=5).pack()
 
         # Commit changes and close
         conn.commit()
@@ -75,11 +74,22 @@ class ManageDB:
             'they': self.conjugation_table[15].get(),
             })
 
-        # Commit changes and close
+        # Commit changes and close db
         conn.commit()
         conn.close()
-        return
 
+        # Clear the table and create it again
+        for item in self.conjugation_table:
+            item.destroy()
+        self.conjugation_table.clear()
+        self.db_manager()
+
+        # Delete & update the recent widget
+        for widget in self.r_frame.winfo_children():
+            widget.destroy()
+        self.recent()
+
+        return
 
 
 ManageDB()
