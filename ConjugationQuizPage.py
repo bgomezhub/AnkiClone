@@ -17,7 +17,6 @@ class ConjugationQuizPage:
         # Define & Display conjugation table
         self.conjugation_table = []
         self.define_conjugation_table(self.f_conjugation_table)
-        self.display_conjugation_table()
 
         # Submission
         self.submit = Button(
@@ -25,23 +24,18 @@ class ConjugationQuizPage:
         self.submit.grid(column=0, row=8, columnspan=2, sticky='S', pady=20)  # Padding between table & button
 
     def define_conjugation_table(self, frame):
-        self.conjugation_table.append(Label(frame, text=self.conjugation[0]))  # Placeholder
+        # Define conjugation
+        self.conjugation_table.append(Label(frame, text=self.conjugation[0]))
+        self.conjugation_table[0].grid(column=0, row=0)
+        # Build table
         con_subjects = ['Je', 'Tu', 'Il/Elle', 'Nous', 'Vous', 'Ils/Elles']
-        i = 0
         for num in range(1, 14):
             if num % 2 == 0:
-                self.conjugation_table.append(Label(frame, text=con_subjects[i], pady=8, padx=25))
-                i += 1
+                self.conjugation_table.append(Label(frame, text=con_subjects[num//2 - 1], pady=8, padx=25))
+                self.conjugation_table[num].grid(column=0, row=num//2)
             else:
                 self.conjugation_table.append(Entry(frame))
-
-    def display_conjugation_table(self):
-        i = 0
-        while i < len(self.conjugation_table) - 1:
-            for row in range(7):
-                for column in range(2):
-                    self.conjugation_table[i].grid(column=column, row=row)
-                    i += 1
+                self.conjugation_table[num].grid(column=1, row=num//2)
 
     def select_conjugation(self):
         # Select all in a list
