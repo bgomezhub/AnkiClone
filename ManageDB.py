@@ -2,9 +2,11 @@ from tkinter import *
 import sqlite3
 
 # Create Table
-#c.execute(
-# "CREATE TABLE present_verb (
-#   infinitive_en TEXT, infinitive_fr TEXT, i TEXT, you TEXT, he_she TEXT, we TEXT, you_formal TEXT, they TEXT)")
+# Connect to database
+#conn = sqlite3.connect('en_fr_words.db')
+# Create cursor
+#c = conn.cursor()
+#c.execute("CREATE TABLE present_verb ( infinitive_en TEXT, infinitive_fr TEXT, i TEXT, you TEXT, he_she TEXT, we TEXT, you_formal TEXT, they TEXT)")
 
 #c.execute('DELETE FROM present_verb WHERE infinitive_en="to speak"')
 #c.execute('SELECT * FROM present_verb')

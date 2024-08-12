@@ -1,3 +1,5 @@
+import random
+import sqlite3
 from tkinter import *
 from math import floor
 
@@ -8,8 +10,9 @@ class ConjugationQuizPage:
         self.f_conjugation_table = Frame(frame)
         self.f_conjugation_table.grid(column=0, row=0, padx=200, pady=150)
 
-        # conjugation to be
-        conjugations = {'To be': ['Etre', 'suis', 'es', 'est', 'sommes', 'etes', 'sont']}  # Placeholder
+        # conjugation
+        self.conjugation = []
+        self.select_conjugation()
 
         # Define & Display conjugation table
         self.conjugation_table = []
@@ -18,12 +21,12 @@ class ConjugationQuizPage:
 
         # Submission
         self.submit = Button(
-            self.f_conjugation_table, text="Submit", command=lambda: self.submission(conjugations['To be']))
+            self.f_conjugation_table, text="Submit", command=lambda: self.submission())
         self.submit.grid(column=0, row=8, columnspan=2, sticky='S', pady=20)  # Padding between table & button
 
     def define_conjugation_table(self, frame):
-        self.conjugation_table.append(Label(frame, text="To be"))  # Placeholder
-        con_subjects = ['Je', 'Tu', 'Il/Elle', 'Nous', 'Vous', 'Ils/Elles']  # Placeholder
+        self.conjugation_table.append(Label(frame, text=self.conjugation[0]))  # Placeholder
+        con_subjects = ['Je', 'Tu', 'Il/Elle', 'Nous', 'Vous', 'Ils/Elles']
         i = 0
         for num in range(1, 14):
             if num % 2 == 0:
@@ -40,11 +43,23 @@ class ConjugationQuizPage:
                     self.conjugation_table[i].grid(column=column, row=row)
                     i += 1
 
+    def select_conjugation(self):
+        # Select all in a list
+        # Connect to database
+        conn = sqlite3.connect('en_fr_words.db')
+        # Create cursor
+        c = conn.cursor()
+        # Select Table
+        c.execute("SELECT * FROM present_verb")
+        db_table = c.fetchall()
+        # Choose random number & assign to conjugation
+        self.conjugation = db_table[random.randint(0, len(db_table) - 1)]
+
     # Submit entries and receive feedback on performance
-    def submission(self, infinitive):
-        i = 0
+    def submission(self):
+        i = 1
         for entry in range(1,14,2):
-            if self.conjugation_table[entry].get() == infinitive[i]:
+            if self.conjugation_table[entry].get() == self.conjugation[i]:
                 feedback = Label(self.f_conjugation_table, text=self.conjugation_table[entry].get(),
                                  padx=40, pady=10, bg='#AAFFAA')  # Correct
             else:
