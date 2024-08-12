@@ -59,12 +59,14 @@ class ConjugationQuizPage:
             else:
                 feedback = Label(self.f_conjugation_table, text=self.conjugation_table[entry].get(),
                                  padx=20, pady=10, bg='#FFAAAA')  # Incorrect
+                Label(self.f_conjugation_table, text=self.conjugation[i], padx=40, pady=10).grid(column=3, row=i - 1)
             # Delete Entry to replace with feedback label
             self.conjugation_table[entry].destroy()
             feedback.grid(column=1, row=floor(entry / 2), sticky='WE')  # 'we' fills area of feedback with color
+            # Show correct answer
             i += 1
 
         # Replace button
         self.submit.destroy()
         done = Button(self.f_conjugation_table, text="Done", command=quit)
-        done.grid(column=0, row=8, columnspan=2, sticky='S', pady=20)
+        done.grid(column=0, row=8, columnspan=3, sticky='S', pady=20)
