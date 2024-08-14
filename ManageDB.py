@@ -26,16 +26,25 @@ class ManageDB:
         # Initiate class variables
         self.section()
         self.conjugation_table = []
-        self.noun_table = []
-        self.con_manager()
+        self.nouns_table = []
 
-        # Show recent inputs
-        self.recent()
+        # Start with conjugation table input
+        self.con_manager()
 
         self.root.mainloop()
 
+    # Display input table for specific section
+    def section(self):
+        conjugations = Button(self.section_f, text="conjugations",
+              command=lambda: self.con_manager()).grid(column=0, row=0, pady=10, sticky='NW')
+        nouns = Button(self.section_f, text="nouns",
+              command=lambda: self.nouns_manager()).grid(column=1, row=0, pady=10, sticky='NW')
+
     def con_manager(self):
-        # Define db manager
+        # Remove nouns table
+        self.reset_manager('nouns', remove=True)
+
+        # Define db manager for conjugations
         con_subjects = ["infinitive en", "infinitive fr", "I", "you", "he/she", "we", "you(formal)", "they"]
         for num in range(0, 16):
             if num % 2 == 0:
@@ -48,31 +57,60 @@ class ManageDB:
         Button(self.table_f, text="submit",
                command=lambda: self.sub_con()).grid(columnspan=2, column=0, row=8, pady=10)
 
-    def noun_manager(self):
-        #c.execute("CREATE TABLE nouns ( en TEXT, fr TEXT, gender TEXT, plural INTEGER)")
-        noun_req = ["English", "French", "Gender", "Plural"]
+        # Show recent inputs
+        self.recent('con')
+        return
+
+    def nouns_manager(self):
+        # Remove conjugation table
+        self.reset_manager('con', remove=True)
+
+        # if call reset then the table to be deleted gets called
+        # need other function to delete and not call it again
+
+        # Define db manager for nouns
+        nouns_req = ["English", "French", "Gender", "Plural"]
         for num in range(0, 8):
             if num % 2 == 0:
-                self.noun_table.append(Label(self.table_f, text=noun_req[num//2]))
-                self.noun_table[num].grid(column=0, row=num//2)
+                self.nouns_table.append(Label(self.table_f, text=nouns_req[num//2]))
+                self.nouns_table[num].grid(column=0, row=num//2)
             else:
-                self.noun_table.append(Entry(self.table_f))
-                self.noun_table[num].grid(column=1, row=num // 2)
+                self.nouns_table.append(Entry(self.table_f))
+                self.nouns_table[num].grid(column=1, row=num // 2)
 
+        # Show recent inputs
+        self.recent('nouns')
+        return
 
-    def section(self):
-        conjugations = Button(self.section_f, text="conjugations",
-              command=lambda: self.con_manager()).grid(column=0, row=0, pady=10, sticky='NW')
-        nouns = Button(self.section_f, text="nouns",
-              command=lambda: self.noun_manager()).grid(column=1, row=0, pady=10, sticky='NW')
+    # Clear all values for new input
+    def reset_manager(self, frame, remove=False):
+        if frame == 'con':
+            for item in self.conjugation_table:
+                item.destroy()
+            self.conjugation_table.clear()
+            # If same section replace with itself
+            if not remove:
+                self.con_manager()
+        else:
+            for item in self.nouns_table:
+                item.destroy()
+            self.nouns_table.clear()
+            # If same section replace with itself
+            if not remove:
+                self.nouns_manager()
 
-    def recent(self):
+        return
+
+    def recent(self, frame):
         # Connect to database
         conn = sqlite3.connect('en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Select Table
-        c.execute("SELECT * FROM present_verb ORDER BY rowid DESC")
+        if frame == 'con':
+            c.execute("SELECT * FROM present_verb ORDER BY rowid DESC")
+        else:
+            c.execute("Select * from nouns ORDER BY rowid DESC")
         # Show recent inputs
         records = c.fetchmany(5)
         for record in records:
@@ -81,6 +119,18 @@ class ManageDB:
         # Commit changes and close
         conn.commit()
         conn.close()
+        return
+
+    def reset_recent(self, frame):
+        # Delete & update the recent widget
+        for widget in self.recent_f.winfo_children():
+            widget.destroy()
+        # Display appropriate recent depending on section
+        if frame == 'con':
+            self.recent('con')
+        else:
+            self.recent('nouns')
+
         return
 
     def sub_con(self):
@@ -105,15 +155,10 @@ class ManageDB:
         conn.close()
 
         # Clear the table and create it again
-        for item in self.conjugation_table:
-            item.destroy()
-        self.conjugation_table.clear()
-        self.con_manager()
+        self.reset_manager('con')
 
         # Delete & update the recent widget
-        for widget in self.recent_f.winfo_children():
-            widget.destroy()
-        self.recent()
+        self.reset_recent('con')
 
         return
 
