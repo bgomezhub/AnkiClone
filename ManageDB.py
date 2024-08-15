@@ -37,9 +37,9 @@ class ManageDB:
 
     # Display input table for specific section
     def section(self):
-        conjugations = Button(self.section_f, text="conjugations",
+        Button(self.section_f, text="conjugations",
               command=lambda: self.con_manager()).grid(column=0, row=0, pady=10, sticky='NW')
-        nouns = Button(self.section_f, text="nouns",
+        Button(self.section_f, text="nouns",
               command=lambda: self.nouns_manager()).grid(column=1, row=0, pady=10, sticky='NW')
 
     def con_manager(self):
@@ -57,7 +57,7 @@ class ManageDB:
                 self.conjugation_table.append(Entry(self.table_f))
                 self.conjugation_table[num].grid(column=1, row=num//2)
         # Submission button
-        Button(self.table_f, text="submit",
+        Button(self.table_f, text="submit_con",
                command=lambda: self.sub_con()).grid(columnspan=2, column=0, row=8, pady=10)
 
         # Show recent inputs
@@ -85,16 +85,15 @@ class ManageDB:
 
     # Clear all values for new input
     def reset_manager(self, frame, remove=False):
+        for widget in self.table_f.winfo_children():
+            widget.destroy()
+
         if frame == 'con':
-            for item in self.conjugation_table:
-                item.destroy()
             self.conjugation_table.clear()
             # If same section replace with itself
             if not remove:
                 self.con_manager()
         else:
-            for item in self.nouns_table:
-                item.destroy()
             self.nouns_table.clear()
             # If same section replace with itself
             if not remove:
@@ -151,6 +150,28 @@ class ManageDB:
             'they': self.conjugation_table[15].get(),
             })
 
+        # Commit changes and close db
+        conn.commit()
+        conn.close()
+
+        # Clear the table and create it again
+        self.reset_manager('con')
+
+        return
+
+    def sub_nouns(self):
+        # Connect to database
+        conn = sqlite3.connect('en_fr_words.db')
+        # Create cursor
+        c = conn.cursor()
+        # Insert values into database
+        '''c.execute("INSERT INTO nouns VALUES (:en, :fr,:gender, :plural)", {
+            'en': self.nouns_table[1].get(),
+            'fr': self.nouns_table[3].get(),
+            'gender': self.nouns_table[5].get(),
+            'plural': self.nouns_table[7].get(),
+            })'''
+        print(f"{self.nouns_table[1]}\n{self.nouns_table[3]}\n{self.nouns_table[5]}\n{self.nouns_table[7]}")
         # Commit changes and close db
         conn.commit()
         conn.close()
