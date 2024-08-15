@@ -3,12 +3,14 @@ import sqlite3
 
 # Create Table
 # Connect to database
-#conn = sqlite3.connect('en_fr_words.db')
+conn = sqlite3.connect('en_fr_words.db')
 # Create cursor
 #c = conn.cursor()
 #c.execute("CREATE TABLE nouns ( en TEXT, fr TEXT, gender TEXT, plural INTEGER)")
-
-#c.execute('DELETE FROM present_verb WHERE infinitive_en="to speak"')
+#c.execute("Select * from present_verb")
+#c.execute('DELETE FROM present_verb WHERE infinitive_en=""')
+#conn.commit()
+#conn.close()
 #c.execute('SELECT * FROM present_verb')
 #print(c.fetchall())
 
@@ -43,6 +45,7 @@ class ManageDB:
     def con_manager(self):
         # Remove nouns table
         self.reset_manager('nouns', remove=True)
+        self.reset_recent('nouns', remove=True)
 
         # Define db manager for conjugations
         con_subjects = ["infinitive en", "infinitive fr", "I", "you", "he/she", "we", "you(formal)", "they"]
@@ -64,9 +67,7 @@ class ManageDB:
     def nouns_manager(self):
         # Remove conjugation table
         self.reset_manager('con', remove=True)
-
-        # if call reset then the table to be deleted gets called
-        # need other function to delete and not call it again
+        self.reset_recent('con', remove=True)
 
         # Define db manager for nouns
         nouns_req = ["English", "French", "Gender", "Plural"]
@@ -121,14 +122,14 @@ class ManageDB:
         conn.close()
         return
 
-    def reset_recent(self, frame):
+    def reset_recent(self, frame, remove=False):
         # Delete & update the recent widget
         for widget in self.recent_f.winfo_children():
             widget.destroy()
         # Display appropriate recent depending on section
-        if frame == 'con':
+        if frame == 'con' and not remove:
             self.recent('con')
-        else:
+        elif frame == 'nouns' and not remove:
             self.recent('nouns')
 
         return
@@ -156,9 +157,6 @@ class ManageDB:
 
         # Clear the table and create it again
         self.reset_manager('con')
-
-        # Delete & update the recent widget
-        self.reset_recent('con')
 
         return
 
