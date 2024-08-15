@@ -57,7 +57,7 @@ class ManageDB:
                 self.conjugation_table.append(Entry(self.table_f))
                 self.conjugation_table[num].grid(column=1, row=num//2)
         # Submission button
-        Button(self.table_f, text="submit_con",
+        Button(self.table_f, text="submit",
                command=lambda: self.sub_con()).grid(columnspan=2, column=0, row=8, pady=10)
 
         # Show recent inputs
@@ -73,11 +73,15 @@ class ManageDB:
         nouns_req = ["English", "French", "Gender", "Plural"]
         for num in range(0, 8):
             if num % 2 == 0:
-                self.nouns_table.append(Label(self.table_f, text=nouns_req[num//2]))
+                self.nouns_table.append(Label(self.table_f, text=nouns_req[num//2], pady=8, padx=25))
                 self.nouns_table[num].grid(column=0, row=num//2)
             else:
                 self.nouns_table.append(Entry(self.table_f))
                 self.nouns_table[num].grid(column=1, row=num // 2)
+
+        # Submission button
+        Button(self.table_f, text="submit",
+               command=lambda: self.sub_nouns()).grid(columnspan=2, column=0, row=8, pady=10)
 
         # Show recent inputs
         self.recent('nouns')
@@ -165,19 +169,18 @@ class ManageDB:
         # Create cursor
         c = conn.cursor()
         # Insert values into database
-        '''c.execute("INSERT INTO nouns VALUES (:en, :fr,:gender, :plural)", {
+        c.execute("INSERT INTO nouns VALUES (:en, :fr,:gender, :plural)", {
             'en': self.nouns_table[1].get(),
             'fr': self.nouns_table[3].get(),
             'gender': self.nouns_table[5].get(),
             'plural': self.nouns_table[7].get(),
-            })'''
-        print(f"{self.nouns_table[1]}\n{self.nouns_table[3]}\n{self.nouns_table[5]}\n{self.nouns_table[7]}")
+            })
         # Commit changes and close db
         conn.commit()
         conn.close()
 
         # Clear the table and create it again
-        self.reset_manager('con')
+        self.reset_manager('nouns')
 
         return
 
