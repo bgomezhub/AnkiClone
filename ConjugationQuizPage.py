@@ -1,14 +1,13 @@
 import random
 import sqlite3
 from tkinter import *
-from math import floor
 
 
 class ConjugationQuizPage:
     def __init__(self, frame):
         # Table Frame
         self.f_conjugation_table = Frame(frame)
-        self.f_conjugation_table.grid(column=0, row=0, padx=200, pady=150)
+        self.f_conjugation_table.grid(column=0, row=0, padx=200, pady=200)
 
         # conjugation
         self.conjugation = []
@@ -52,7 +51,7 @@ class ConjugationQuizPage:
     # Submit entries and receive feedback on performance
     def submission(self):
         i = 1
-        for entry in range(1,14,2):
+        for entry in range(1, 14, 2):
             if self.conjugation_table[entry].get() == self.conjugation[i]:
                 feedback = Label(self.f_conjugation_table, text=self.conjugation_table[entry].get(),
                                  padx=40, pady=10, bg='#AAFFAA')  # Correct
@@ -62,7 +61,7 @@ class ConjugationQuizPage:
                 Label(self.f_conjugation_table, text=self.conjugation[i], padx=40, pady=10).grid(column=3, row=i - 1)
             # Delete Entry to replace with feedback label
             self.conjugation_table[entry].destroy()
-            feedback.grid(column=1, row=floor(entry / 2), sticky='WE')  # 'we' fills area of feedback with color
+            feedback.grid(column=1, row=(entry // 2), sticky='WE')  # 'we' fills area of feedback with color
             # Show correct answer
             i += 1
 
