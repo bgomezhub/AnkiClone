@@ -41,9 +41,9 @@ class ManageDB:
     # Display input table for specific section
     def section(self):
         Button(self.section_f, text="conjugations",
-              command=lambda: self.con_manager(self.current_section)).grid(column=0, row=0, pady=10, sticky='NW')
+               command=lambda: self.con_manager(self.current_section)).grid(column=0, row=0, pady=10, sticky='NW')
         Button(self.section_f, text="nouns",
-              command=lambda: self.nouns_manager(self.current_section)).grid(column=1, row=0, pady=10, sticky='NW')
+               command=lambda: self.nouns_manager(self.current_section)).grid(column=1, row=0, pady=10, sticky='NW')
         Button(self.section_f, text="adjectives",
                command=lambda: self.adjs_manager(self.current_section)).grid(column=2, row=0, pady=10, sticky='NW')
 
@@ -196,7 +196,7 @@ class ManageDB:
             self.recent('con')
         elif frame == 'nouns' and not remove:
             self.recent('nouns')
-        else:
+        elif frame == 'adjs' and not remove:
             self.recent('adjs')
 
         return
@@ -255,11 +255,11 @@ class ManageDB:
         c = conn.cursor()
         # Insert values into database
         c.execute("INSERT INTO adjectives VALUES (:en, :masc,:fem, :mascp, :femp)", {
-            'en': self.nouns_table[1].get(),
-            'masc': self.nouns_table[3].get(),
-            'fem': self.nouns_table[5].get(),
-            'mascp': self.nouns_table[7].get(),
-            'femp': self.nouns_table[9].get(),
+            'en': self.adjs_table[1].get(),
+            'masc': self.adjs_table[3].get(),
+            'fem': self.adjs_table[5].get(),
+            'mascp': self.adjs_table[7].get(),
+            'femp': self.adjs_table[9].get(),
         })
         # Commit changes and close db
         conn.commit()
