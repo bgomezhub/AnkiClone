@@ -33,23 +33,33 @@ class ManageDB:
         self.adjs_table = []
 
         # Start with conjugation table input
-        self.con_manager()
+        self.current_section = 'con'
+        self.con_manager(self.current_section)
 
         self.root.mainloop()
 
     # Display input table for specific section
     def section(self):
         Button(self.section_f, text="conjugations",
-              command=lambda: self.con_manager()).grid(column=0, row=0, pady=10, sticky='NW')
+              command=lambda: self.con_manager(self.current_section)).grid(column=0, row=0, pady=10, sticky='NW')
         Button(self.section_f, text="nouns",
-              command=lambda: self.nouns_manager()).grid(column=1, row=0, pady=10, sticky='NW')
+              command=lambda: self.nouns_manager(self.current_section)).grid(column=1, row=0, pady=10, sticky='NW')
         Button(self.section_f, text="adjectives",
-               command=lambda: self.adjs_manager()).grid(column=2, row=0, pady=10, sticky='NW')
+               command=lambda: self.adjs_manager(self.current_section)).grid(column=2, row=0, pady=10, sticky='NW')
 
-    def con_manager(self):
-        # Remove nouns table
-        self.reset_manager('nouns', remove=True)
-        self.reset_recent('nouns', remove=True)
+    def con_manager(self, current_section):
+        # Remove current table if not conjugations
+        if current_section == 'nouns':
+            self.reset_manager('nouns', remove=True)
+            self.reset_recent('nouns', remove=True)
+        elif current_section == 'adjs':
+            self.reset_manager('adjs', remove=True)
+            self.reset_recent('adjs', remove=True)
+        else:
+            self.reset_recent('con', remove=True)
+
+        # Update current_section
+        self.current_section = 'con'
 
         # Define db manager for conjugations
         con_subjects = ["infinitive en", "infinitive fr", "I", "you", "he/she", "we", "you(formal)", "they"]
@@ -68,10 +78,19 @@ class ManageDB:
         self.recent('con')
         return
 
-    def nouns_manager(self):
-        # Remove conjugation table
-        self.reset_manager('con', remove=True)
-        self.reset_recent('con', remove=True)
+    def nouns_manager(self, current_section):
+        # Remove current table if not nouns
+        if current_section == 'con':
+            self.reset_manager('con', remove=True)
+            self.reset_recent('con', remove=True)
+        elif current_section == 'adjs':
+            self.reset_manager('adjs', remove=True)
+            self.reset_recent('adjs', remove=True)
+        else:
+            self.reset_recent('nouns', remove=True)
+
+        # Update current_section
+        self.current_section = 'nouns'
 
         # Define db manager for nouns
         nouns_req = ["English", "French", "Gender", "Plural"]
@@ -91,10 +110,19 @@ class ManageDB:
         self.recent('nouns')
         return
 
-    def adjs_manager(self):
-        # Remove conjugation table
-        self.reset_manager('con', remove=True)
-        self.reset_recent('con', remove=True)
+    def adjs_manager(self, current_section):
+        # Remove current table if not adjectives
+        if current_section == 'con':
+            self.reset_manager('con', remove=True)
+            self.reset_recent('con', remove=True)
+        elif current_section == 'nouns':
+            self.reset_manager('nouns', remove=True)
+            self.reset_recent('nouns', remove=True)
+        else:
+            self.reset_recent('adjs', remove=True)
+
+        # Update current_section
+        self.current_section = 'adjs'
 
         # Define db manager for nouns
         adjs_req = ["English", "Masc. S.", "Fem. S.", "Masc. P.", "Fem. P."]
@@ -123,17 +151,17 @@ class ManageDB:
             self.conjugation_table.clear()
             # If same section replace with itself
             if not remove:
-                self.con_manager()
+                self.con_manager(self.current_section)
         elif frame == 'nouns':
             self.nouns_table.clear()
             # If same section replace with itself
             if not remove:
-                self.nouns_manager()
+                self.nouns_manager(self.current_section)
         else:
             self.adjs_table.clear()
             # If same section replace with itself
             if not remove:
-                self.adjs_manager()
+                self.adjs_manager(self.current_section)
 
         return
 
