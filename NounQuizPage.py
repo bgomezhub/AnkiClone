@@ -9,9 +9,13 @@ class NounQuizPage:
         self.f_nouns_table = Frame(frame)
         self.f_nouns_table.grid(column=0, row=0, padx=200, pady=200)
 
-        # select noun
+        # Select noun
         self.noun = []
         self.select_noun()
+
+        # Properties of noun
+        self.gen = StringVar()
+        self.plural = IntVar()
 
         # Define & Display nouns table
         self.nouns_table = []
@@ -27,18 +31,17 @@ class NounQuizPage:
         # Define noun
         self.nouns_table.append(Label(self.f_nouns_table, text=self.noun[0], font=('Arial', 30), padx=20, pady=10))
         self.nouns_table[0].grid(column=0, row=0, columnspan=4)
+
         # Define plurality
-        check = IntVar()
-        Checkbutton(self.f_nouns_table, text="Les", variable=check, onvalue=1, offvalue=0).grid(column=0, row=1)
+        Checkbutton(self.f_nouns_table, text="Les", variable=self.plural, onvalue=1, offvalue=0).grid(column=0, row=1)
+
         # Define gender
-        gen = StringVar()
-        self.nouns_table.append(Radiobutton(self.f_nouns_table, text="Le", variable=gen, value='Le'))
-        self.nouns_table[1].grid(column=1, row=1)
-        self.nouns_table.append(Radiobutton(self.f_nouns_table, text="La", variable=gen, value='La'))
-        self.nouns_table[2].grid(column=2, row=1)
+        Radiobutton(self.f_nouns_table, text="Le", variable=self.gen,  value='le').grid(column=1, row=1)
+        Radiobutton(self.f_nouns_table, text="La", variable=self.gen, value='la').grid(column=2, row=1)
+
         # Define Input box
         self.nouns_table.append(Entry(self.f_nouns_table))
-        self.nouns_table[3].grid(column=3, row=1)
+        self.nouns_table[1].grid(column=3, row=1)
 
     def select_noun(self):
         # Select all in a list
@@ -55,22 +58,37 @@ class NounQuizPage:
 
     # Submit entries and receive feedback on performance
     def submission(self):
-        i = 1
-        for entry in range(1, 14, 2):
-            if self.nouns_table[entry].get() == self.noun[i]:
-                feedback = Label(self.f_nouns_table, text=self.nouns_table[entry].get(),
-                                 padx=40, pady=10, bg='#AAFFAA')  # Correct
-            else:
-                feedback = Label(self.f_nouns_table, text=self.nouns_table[entry].get(),
-                                 padx=20, pady=10, bg='#FFAAAA')  # Incorrect
-                Label(self.f_nouns_table, text=self.noun[i], padx=40, pady=10).grid(column=3, row=i - 1)
-            # Delete Entry to replace with feedback label
-            self.nouns_table[entry].destroy()
-            feedback.grid(column=1, row=(entry // 2), sticky='WE')  # 'we' fills area of feedback with color
-            # Show correct answer
-            i += 1
+        # Check fr translation
+        if self.nouns_table[1].get() == self.noun[1]:
+            feedback = Label(self.f_nouns_table, text=self.nouns_table[1].get(), padx=40, pady=10, bg='#AAFFAA')
+        else:
+            Label(self.f_nouns_table, text=self.noun[1], padx=40, pady=10).grid(column=4, row=1)
+            feedback = Label(self.f_nouns_table, text=self.nouns_table[1].get(), padx=40, pady=10, bg='#FFAAAA')
+        self.nouns_table[1].destroy()  # Clear Entry from screen
+        # Clear list to gather info to be displayed
+        self.nouns_table.clear()
+        self.nouns_table.append(feedback)
 
-        # Replace button
+        # Check gender
+        if self.gen.get() == self.noun[-2]:
+            self.nouns_table.append(Label(self.f_nouns_table, text=self.noun[-2], padx=40, pady=10, bg='#AAFFAA'))
+        else:
+            self.nouns_table.append(Label(self.f_nouns_table, text=self.gen.get(), padx=40, pady=10, bg='#FFAAAA'))
+
+        # Check Plurality
+        if self.plural.get() == self.noun[-1] and self.noun[-1] == 0:
+            self.nouns_table.append(Label(self.f_nouns_table, text="Not Plural", padx=40, pady=10, bg='#AAFFAA'))
+        elif self.plural.get() == self.noun[-1] and self.noun[-1] == 1:
+            self.nouns_table.append(Label(self.f_nouns_table, text="Plural", padx=40, pady=10, bg='#AAFFAA'))
+        else:
+            if self.noun[-1] == 0:
+                self.nouns_table.append(Label(self.f_nouns_table, text="Not Plural", padx=40, pady=10, bg='#FFAAAA'))
+            else:
+                self.nouns_table.append(Label(self.f_nouns_table, text="Not Plural", padx=40, pady=10, bg='#FFAAAA'))
+        # Display feedback
+        for i in range(-1, -4, -1):
+            self.nouns_table[i].grid(column=abs(i + 1), row=1)
+        # Display Button
         self.submit.destroy()
-        done = Button(self.f_nouns_table, text="Done", command=quit)
-        done.grid(column=0, row=2, columnspan=4, sticky='S', pady=20)
+        done = Button(self.f_nouns_table, text='Done', command=quit)
+        done.grid(column=0, row=2, columnspan=4, pady=20)
