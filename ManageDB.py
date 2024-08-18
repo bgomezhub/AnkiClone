@@ -41,6 +41,8 @@ class ManageDB:
               command=lambda: self.con_manager()).grid(column=0, row=0, pady=10, sticky='NW')
         Button(self.section_f, text="nouns",
               command=lambda: self.nouns_manager()).grid(column=1, row=0, pady=10, sticky='NW')
+        Button(self.section_f, text="adjectives",
+               command=lambda: self.adjs_manager()).grid(column=2, row=0, pady=10, sticky='NW')
 
     def con_manager(self):
         # Remove nouns table
@@ -85,6 +87,9 @@ class ManageDB:
 
         # Show recent inputs
         self.recent('nouns')
+        return
+
+    def adjs_manager(self):
         return
 
     # Clear all values for new input
