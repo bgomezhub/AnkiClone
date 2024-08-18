@@ -3,10 +3,11 @@ import sqlite3
 
 # Create Table
 # Connect to database
-conn = sqlite3.connect('en_fr_words.db')
+#conn = sqlite3.connect('en_fr_words.db')
 # Create cursor
 #c = conn.cursor()
 #c.execute("CREATE TABLE nouns ( en TEXT, fr TEXT, gender TEXT, plural INTEGER)")
+#c.execute("CREATE TABLE adjectives ( en TEXT, masc TEXT, fem TEXT, mascp TEXT, femp TEXT)")
 #c.execute("Select * from present_verb")
 #c.execute('DELETE FROM present_verb WHERE infinitive_en=""')
 #conn.commit()
@@ -123,11 +124,16 @@ class ManageDB:
             # If same section replace with itself
             if not remove:
                 self.con_manager()
-        else:
+        elif frame == 'nouns':
             self.nouns_table.clear()
             # If same section replace with itself
             if not remove:
                 self.nouns_manager()
+        else:
+            self.adjs_table.clear()
+            # If same section replace with itself
+            if not remove:
+                self.adjs_manager()
 
         return
 
@@ -139,8 +145,10 @@ class ManageDB:
         # Select Table
         if frame == 'con':
             c.execute("SELECT * FROM present_verb ORDER BY rowid DESC")
-        else:
+        elif frame == 'nouns':
             c.execute("Select * from nouns ORDER BY rowid DESC")
+        else:
+            c.execute("SELECT * FROM adjectives ORDER BY rowid DESC")
         # Show recent inputs
         records = c.fetchmany(5)
         for record in records:
@@ -160,6 +168,8 @@ class ManageDB:
             self.recent('con')
         elif frame == 'nouns' and not remove:
             self.recent('nouns')
+        else:
+            self.recent('adjs')
 
         return
 
@@ -207,6 +217,28 @@ class ManageDB:
 
         # Clear the table and create it again
         self.reset_manager('nouns')
+
+        return
+
+    def sub_adjs(self):
+        # Connect to database
+        conn = sqlite3.connect('en_fr_words.db')
+        # Create cursor
+        c = conn.cursor()
+        # Insert values into database
+        c.execute("INSERT INTO adjectives VALUES (:en, :masc,:fem, :mascp, :femp)", {
+            'en': self.nouns_table[1].get(),
+            'masc': self.nouns_table[3].get(),
+            'fem': self.nouns_table[5].get(),
+            'mascp': self.nouns_table[7].get(),
+            'femp': self.nouns_table[9].get(),
+        })
+        # Commit changes and close db
+        conn.commit()
+        conn.close()
+
+        # Clear the table and create it again
+        self.reset_manager('adjs')
 
         return
 
