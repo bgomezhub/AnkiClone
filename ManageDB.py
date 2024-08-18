@@ -29,6 +29,7 @@ class ManageDB:
         self.section()
         self.conjugation_table = []
         self.nouns_table = []
+        self.adjs_table = []
 
         # Start with conjugation table input
         self.con_manager()
@@ -90,6 +91,26 @@ class ManageDB:
         return
 
     def adjs_manager(self):
+        # Remove conjugation table
+        self.reset_manager('con', remove=True)
+        self.reset_recent('con', remove=True)
+
+        # Define db manager for nouns
+        adjs_req = ["English", "Masc. S.", "Fem. S.", "Masc. P.", "Fem. P."]
+        for num in range(0, 10):
+            if num % 2 == 0:
+                self.adjs_table.append(Label(self.table_f, text=adjs_req[num // 2], pady=8, padx=25))
+                self.adjs_table[num].grid(column=0, row=num // 2)
+            else:
+                self.adjs_table.append(Entry(self.table_f))
+                self.adjs_table[num].grid(column=1, row=num // 2)
+
+        # Submission button
+        Button(self.table_f, text="submit",
+               command=lambda: self.sub_adjs()).grid(columnspan=2, column=0, row=8, pady=10)
+
+        # Show recent inputs
+        self.recent('adjs')
         return
 
     # Clear all values for new input
