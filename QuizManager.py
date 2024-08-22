@@ -1,42 +1,53 @@
-from tkinter import *
+# Import python files
 import sqlite3
 import random
 import datetime
-
+# Import quiz Pages
 import ConjugationQuizPage
 import NounQuizPage
 import AdjectivesQuizPage
+import FinishPage
 
-class QuizManger:
-    def __init__(self, frame):
-        self.quiz_list = []
-        self.new_words_limit = 5
 
-        # Prepare Questions
-        self.select_questions()
+def select_questions():
+    # Select all in a list
+    # Connect to database
+    conn = sqlite3.connect('en_fr_words.db')
+    # Create cursor
+    c = conn.cursor()
 
-        # Send to page corresponding to word
-        word = self.quiz_list[random.randint(0, len(self.quiz_list) - 1)]
-        if word[1] == 'present_verb':
-            ConjugationQuizPage.ConjugationQuizPage(frame, word)
-        elif word[1] == 'noun':
-            NounQuizPage.NounQuizPage(frame, word)
-        elif word[1] == 'adjective':
-            AdjectivesQuizPage.AdjectivesQuizPage(frame, word)
+    # Select new words
+    c.execute("SELECT * FROM word_info WHERE new = 1")
+    # Add new words to quiz list
+    word_list = c.fetchmany(1)  # Temporary
 
-    def select_questions(self):
-        # Select all in a list
-        # Connect to database
-        conn = sqlite3.connect('en_fr_words.db')
-        # Create cursor
-        c = conn.cursor()
+    # Select due words
+    c.execute(f"Select * FROM word_info "
+              f"WHERE cooldown <= {datetime.datetime.now().strftime('%Y%m%d')} AND new = 0")
+    word_list += c.fetchall()
+    return word_list
 
-        # Select new words
-        c.execute("SELECT * FROM word_info WHERE new = 1")
-        # Add new words to quiz list
-        self.quiz_list = c.fetchmany(self.new_words_limit)
 
-        # Select due words
-        c.execute(f"Select * FROM word_info WHERE cooldown <= {datetime.datetime.now().strftime('%Y%m%d')}")
-        self.quiz_list += c.fetchall()
+def next_question(frame, word_list, remove_word=None):
+    # Base condition
+    if len(word_list) == 0:
+        return FinishPage.FinishPage(frame)
+
+    # Randomize next word
+    rand_index = random.randint(0, len(word_list) - 1)
+    # Send to corresponding page
+    if word_list[rand_index][1] == 'present_verb':
+        ConjugationQuizPage.ConjugationQuizPage(frame, [word_list, rand_index])
+    elif word_list[rand_index][1] == 'noun':
+        NounQuizPage.NounQuizPage(frame, [word_list, rand_index])
+    elif word_list[rand_index][1] == 'adjective':
+        AdjectivesQuizPage.AdjectivesQuizPage(frame, [word_list, rand_index])
+
+
+def remove_question(word_list):
+    rand_index = word_list[1]
+    word_list = word_list[0]
+    word_list.remove(word_list[rand_index])
+
+    return word_list
 
