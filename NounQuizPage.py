@@ -1,18 +1,20 @@
-import random
 import sqlite3
 from tkinter import *
 
+import QuizManager
+
 
 class NounQuizPage:
-    def __init__(self, frame):
+    def __init__(self, frame, word_list):
         # Table Frame
+        self.root_frame = frame
         self.f_nouns_table = Frame(frame)
         self.f_nouns_table.grid(column=0, row=0, padx=200, pady=200)
 
         # Select noun
-        self.noun = []
-        self.select_noun()
-
+        word = word_list[0][word_list[1]][0]
+        self.noun = ''
+        self.select_noun(word)
         # Properties of noun
         self.gen = StringVar()
         self.plural = IntVar()
@@ -23,7 +25,7 @@ class NounQuizPage:
 
         # Submission
         self.submit = Button(
-            self.f_nouns_table, text="Submit", command=lambda: self.submission())
+            self.f_nouns_table, text="Submit", command=lambda: self.submission(word_list))
         self.submit.grid(column=0, row=2, columnspan=4, sticky='S', pady=20)  # Padding between table & button
 
     def define_nouns_table(self):
@@ -42,22 +44,22 @@ class NounQuizPage:
         # Define Input box
         self.nouns_table.append(Entry(self.f_nouns_table))
         self.nouns_table[1].grid(column=3, row=1)
+        return
 
-    def select_noun(self):
+    def select_noun(self, word):
         # Select all in a list
         # Connect to database
         conn = sqlite3.connect('en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Select Table
-        c.execute("SELECT * FROM nouns")
-        db_table = c.fetchall()
-        # Choose random number & assign to conjugation
-        self.noun = db_table[random.randint(0, len(db_table) - 1)]
+        c.execute(f"SELECT * FROM noun WHERE en = '{word}'")
+        # Retrieve word
+        self.noun = c.fetchone()
         return
 
     # Submit entries and receive feedback on performance
-    def submission(self):
+    def submission(self, word_list):
         # Check fr translation
         if self.nouns_table[1].get() == self.noun[1]:
             feedback = Label(self.f_nouns_table, text=self.nouns_table[1].get(), padx=40, pady=10, bg='#AAFFAA')
@@ -85,10 +87,21 @@ class NounQuizPage:
                 self.nouns_table.append(Label(self.f_nouns_table, text="Not Plural", padx=40, pady=10, bg='#FFAAAA'))
             else:
                 self.nouns_table.append(Label(self.f_nouns_table, text="Not Plural", padx=40, pady=10, bg='#FFAAAA'))
+
         # Display feedback
         for i in range(-1, -4, -1):
             self.nouns_table[i].grid(column=abs(i + 1), row=1)
+
         # Display Button
         self.submit.destroy()
-        done = Button(self.f_nouns_table, text='Done', command=quit)
+        done = Button(self.f_nouns_table, text='Next', command=lambda: self.return_quiz_manager(word_list))
         done.grid(column=0, row=2, columnspan=4, pady=20)
+        return
+
+    # Destroy page and return to QuizManager.py
+    def return_quiz_manager(self, word_list):
+        for widget in self.root_frame.winfo_children():
+            widget.destroy()
+
+        QuizManager.remove_question(word_list)
+        return QuizManager.next_question(self.root_frame, word_list[0], self.noun)
