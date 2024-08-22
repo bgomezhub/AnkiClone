@@ -83,5 +83,5 @@ class AdjectivesQuizPage:
             widget.destroy()
 
         word_list = QuizManager.remove_question(word_list)
-        return QuizManager.next_question(self.root_frame, word_list[0], self.adj)
+        return QuizManager.next_question(self.root_frame, word_list, self.adj)
 

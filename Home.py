@@ -15,7 +15,7 @@ class Home:
         # Type of Quiz
         self.f_home_options = Frame(frame)
         self.f_home_options.pack(padx=200, pady=100)
-        Button(self.f_home_options, text='Quiz',
+        Button(self.f_home_options, text='Quiz', font=('Arial', 14),
                command=lambda: self.submission(frame, 'quiz')).grid(column=0, row=0)
 
     def submission(self, frame, option):

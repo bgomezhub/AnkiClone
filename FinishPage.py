@@ -7,7 +7,7 @@ class FinishPage:
     def __init__(self, frame):
         # Title
         self.f_finish_title = Frame(frame)
-        self.f_finish_title.pack(padx=200, pady=50)
+        self.f_finish_title.pack(pady=150, padx=150)
         Label(self.f_finish_title, text=f'Congratulations you finished!', font=('Arial', 30)).pack()
         # Type of Quiz
         self.f_finish_options = Frame(frame)

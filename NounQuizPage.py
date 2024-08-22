@@ -84,7 +84,7 @@ class NounQuizPage:
             self.nouns_table.append(Label(self.f_nouns_table, text="Plural", padx=40, pady=10, bg='#AAFFAA'))
         else:
             if self.noun[-1] == 0:
-                self.nouns_table.append(Label(self.f_nouns_table, text="Not Plural", padx=40, pady=10, bg='#FFAAAA'))
+                self.nouns_table.append(Label(self.f_nouns_table, text="Plural", padx=40, pady=10, bg='#FFAAAA'))
             else:
                 self.nouns_table.append(Label(self.f_nouns_table, text="Not Plural", padx=40, pady=10, bg='#FFAAAA'))
 
@@ -103,5 +103,5 @@ class NounQuizPage:
         for widget in self.root_frame.winfo_children():
             widget.destroy()
 
-        QuizManager.remove_question(word_list)
-        return QuizManager.next_question(self.root_frame, word_list[0], self.noun)
+        word_list = QuizManager.remove_question(word_list)
+        return QuizManager.next_question(self.root_frame, word_list, self.noun)

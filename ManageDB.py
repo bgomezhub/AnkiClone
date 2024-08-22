@@ -233,7 +233,7 @@ class ManageDB:
             'plural': self.nouns_table[7].get(),
             })
         c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :pts_cap, :cooldown)", {
-            'word': self.conjugation_table[1].get(),
+            'word': self.nouns_table[1].get(),
             'type': 'noun',
             'new': 1,
             'pts': 0,
@@ -263,7 +263,7 @@ class ManageDB:
             'femp': self.adjs_table[9].get(),
         })
         c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :pts_cap, :cooldown)", {
-            'word': self.conjugation_table[1].get(),
+            'word': self.adjs_table[1].get(),
             'type': 'adjective',
             'new': 1,
             'pts': 0,

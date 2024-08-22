@@ -83,5 +83,5 @@ class ConjugationQuizPage:
         for widget in self.root_frame.winfo_children():
             widget.destroy()
 
-        QuizManager.remove_question(word_list)
-        return QuizManager.next_question(self.root_frame, word_list[0], self.conjugation)
+        word_list = QuizManager.remove_question(word_list)
+        return QuizManager.next_question(self.root_frame, word_list, self.conjugation)
