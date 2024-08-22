@@ -1,21 +1,6 @@
 from tkinter import *
 import sqlite3
 
-# Create Table
-# Connect to database
-#conn = sqlite3.connect('en_fr_words.db')
-# Create cursor
-#c = conn.cursor()
-#c.execute("CREATE TABLE nouns ( en TEXT, fr TEXT, gender TEXT, plural INTEGER)")
-#c.execute("CREATE TABLE adjectives ( en TEXT, masc TEXT, fem TEXT, mascp TEXT, femp TEXT)")
-#c.execute("Select * from present_verb")
-#c.execute('DELETE FROM present_verb WHERE infinitive_en=""')
-#conn.commit()
-#conn.close()
-#c.execute('SELECT * FROM present_verb')
-#print(c.fetchall())
-
-
 class ManageDB:
     def __init__(self):
         # Define frames, section->table->recent
@@ -217,6 +202,14 @@ class ManageDB:
             'you_formal': self.conjugation_table[13].get(),
             'they': self.conjugation_table[15].get(),
             })
+        c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :pts_cap, :cooldown)", {
+            'word': self.conjugation_table[1].get(),
+            'type': 'present_verb',
+            'new': 1,
+            'pts': 0,
+            'pts_cap': 0,
+            'cooldown': '20240101',
+        })
 
         # Commit changes and close db
         conn.commit()
@@ -239,6 +232,14 @@ class ManageDB:
             'gender': self.nouns_table[5].get(),
             'plural': self.nouns_table[7].get(),
             })
+        c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :pts_cap, :cooldown)", {
+            'word': self.conjugation_table[1].get(),
+            'type': 'noun',
+            'new': 1,
+            'pts': 0,
+            'pts_cap': 0,
+            'cooldown': '20240101',
+        })
         # Commit changes and close db
         conn.commit()
         conn.close()
@@ -260,6 +261,14 @@ class ManageDB:
             'fem': self.adjs_table[5].get(),
             'mascp': self.adjs_table[7].get(),
             'femp': self.adjs_table[9].get(),
+        })
+        c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :pts_cap, :cooldown)", {
+            'word': self.conjugation_table[1].get(),
+            'type': 'adjective',
+            'new': 1,
+            'pts': 0,
+            'pts_cap': 0,
+            'cooldown': '20240101',
         })
         # Commit changes and close db
         conn.commit()
