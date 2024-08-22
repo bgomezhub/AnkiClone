@@ -1,21 +1,18 @@
-from tkinter import *
+import customtkinter as ctk
 
-import ConjugationQuizPage
-import NounQuizPage
-import AdjectivesQuizPage
 import QuizManager
 
 
 class Home:
     def __init__(self, frame):
         # Title
-        self.f_home_title = Frame(frame)
+        self.f_home_title = ctk.CTkFrame(frame)
         self.f_home_title.pack(padx=200, pady=100)
-        Label(self.f_home_title, text='Welcome', font=('Arial', 30)).pack()
+        ctk.CTkLabel(self.f_home_title, text='Welcome', font=('Arial', 30)).pack()
         # Type of Quiz
-        self.f_home_options = Frame(frame)
+        self.f_home_options = ctk.CTkFrame(frame)
         self.f_home_options.pack(padx=200, pady=100)
-        Button(self.f_home_options, text='Quiz', font=('Arial', 14),
+        ctk.CTkButton(self.f_home_options, text='Quiz', font=('Arial', 14),
                command=lambda: self.submission(frame, 'quiz')).grid(column=0, row=0)
 
     def submission(self, frame, option):
