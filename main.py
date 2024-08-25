@@ -3,7 +3,7 @@ import customtkinter as ctk
 import Home
 
 # Define attributes of CTK
-ctk.set_appearance_mode("dark")
+ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("themes/mytheme.json")
 
 # Define root widget
