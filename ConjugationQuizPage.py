@@ -15,6 +15,8 @@ class ConjugationQuizPage:
         self.f_conjugation_table.grid(column=0, row=1, padx=200, pady=25)
         self.f_submission = ctk.CTkFrame(frame)
         self.f_submission.grid(column=0, row=2, padx=200, pady=50)
+        # Font for body
+        self.font_b = ('Arial', 14)
 
         # conjugation
         word = word_list[0][word_list[1]][0]
@@ -27,7 +29,7 @@ class ConjugationQuizPage:
 
         # Submission
         self.submit = ctk.CTkButton(
-            self.f_submission, text="Submit", command=lambda: self.submission(word_list))
+            self.f_submission, text="Submit", font=self.font_b, command=lambda: self.submission(word_list))
         self.submit.grid(column=0, row=0, sticky='S', pady=20)  # Padding between table & button
 
     def define_conjugation_table(self):
@@ -39,7 +41,7 @@ class ConjugationQuizPage:
         for num in range(0, 14):
             if num % 2 == 0:
                 self.conjugation_table.append(
-                    ctk.CTkLabel(self.f_conjugation_table, text=con_subjects[num//2], pady=12, padx=25))
+                    ctk.CTkLabel(self.f_conjugation_table, text=con_subjects[num//2], font=self.font_b, pady=12, padx=25))
                 self.conjugation_table[num].grid(column=0, row=num//2)
             else:
                 self.conjugation_table.append(ctk.CTkEntry(self.f_conjugation_table))
@@ -65,10 +67,10 @@ class ConjugationQuizPage:
         for entry in range(1, 14, 2):
             if self.conjugation_table[entry].get() == self.conjugation[i]:
                 feedback = ctk.CTkLabel(self.f_conjugation_table, text=self.conjugation_table[entry].get(),
-                                 padx=25, pady=12, bg_color='#AAFFAA')  # Correct
+                                        font=self.font_b, padx=25, pady=12, bg_color='#AAFFAA')  # Correct
             else:
                 feedback = ctk.CTkLabel(self.f_conjugation_table, text=self.conjugation_table[entry].get(),
-                                 padx=25, pady=12, bg_color='#FFAAAA')  # Incorrect
+                                        font=self.font_b, padx=25, pady=12, bg_color='#FFAAAA')  # Incorrect
                 ctk.CTkLabel(self.f_conjugation_table, text=self.conjugation[i], padx=25, pady=12).grid(column=3, row=i - 1)
             # Delete Entry to replace with feedback label
             self.conjugation_table[entry].destroy()
@@ -78,7 +80,8 @@ class ConjugationQuizPage:
 
         # Replace button
         self.submit.destroy()
-        done = ctk.CTkButton(self.f_submission, text="Next", command=lambda: self.return_quiz_manager(word_list))
+        done = ctk.CTkButton(
+            self.f_submission, text="Next", font=self.font_b, command=lambda: self.return_quiz_manager(word_list))
         done.grid(column=0, row=0, sticky='S', pady=20)
         return
 
