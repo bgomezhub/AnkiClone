@@ -63,21 +63,18 @@ class AdjectivesQuizPage:
 
     # Submit entries and receive feedback on performance
     def submission(self, word_list):
-        i = 1
         for entry in range(1, 8, 2):
-            if self.adj_table[entry].get() == self.adj[i]:
+            if self.adj_table[entry].get() == self.adj[-(-entry // 2)]:
                 feedback = ctk.CTkLabel(self.f_adj_table, text=self.adj_table[entry].get(), font=self.font_b,
                                         padx=25, pady=12, bg_color='#AAFFAA')  # Correct
             else:
                 feedback = ctk.CTkLabel(self.f_adj_table, text=self.adj_table[entry].get(), font=self.font_b,
                                         padx=25, pady=12, bg_color='#FFAAAA')  # Incorrect
-                ctk.CTkLabel(self.f_adj_table, text=self.adj[i], font=self.font_b,
+                ctk.CTkLabel(self.f_adj_table, text=self.adj[-(-entry // 2)], font=self.font_b,
                              padx=25, pady=12).grid(column=3, row=entry // 2)
             # Delete Entry to replace with feedback label
             self.adj_table[entry].destroy()
             feedback.grid(column=1, row=(entry // 2), sticky='WE')  # 'we' fills area of feedback with color
-            # Show correct answer
-            i += 1
 
         # Replace button
         self.submit.destroy()
