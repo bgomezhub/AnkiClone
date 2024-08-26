@@ -15,6 +15,7 @@ class ConjugationQuizPage:
         self.f_conjugation_table.grid(column=0, row=1, padx=200, pady=25)
         self.f_submission = ctk.CTkFrame(frame)
         self.f_submission.grid(column=0, row=2, padx=200, pady=50)
+
         # Font for body
         self.font_b = ('Arial', 14)
 
@@ -30,7 +31,7 @@ class ConjugationQuizPage:
         # Submission
         self.submit = ctk.CTkButton(
             self.f_submission, text="Submit", font=self.font_b, command=lambda: self.submission(word_list))
-        self.submit.grid(column=0, row=0, sticky='S', pady=20)  # Padding between table & button
+        self.submit.grid(column=0, row=0, sticky='S', pady=20)
 
     def define_conjugation_table(self):
         # Define conjugation question (top)
@@ -71,7 +72,8 @@ class ConjugationQuizPage:
             else:
                 feedback = ctk.CTkLabel(self.f_conjugation_table, text=self.conjugation_table[entry].get(),
                                         font=self.font_b, padx=25, pady=12, bg_color='#FFAAAA')  # Incorrect
-                ctk.CTkLabel(self.f_conjugation_table, text=self.conjugation[i], padx=25, pady=12).grid(column=3, row=i - 1)
+                ctk.CTkLabel(self.f_conjugation_table, text=self.conjugation[i], font=self.font_b,
+                             padx=25, pady=12).grid(column=3, row=i - 1)
             # Delete Entry to replace with feedback label
             self.conjugation_table[entry].destroy()
             feedback.grid(column=1, row=(entry // 2), sticky='WE')  # 'we' fills area of feedback with color
