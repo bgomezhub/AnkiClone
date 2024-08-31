@@ -28,6 +28,18 @@ def select_questions():
     return word_list
 
 
+def select_word(table, word):
+    # Select all in a list
+    # Connect to database
+    conn = sqlite3.connect('en_fr_words.db')
+    # Create cursor
+    c = conn.cursor()
+    # Select Table
+    c.execute(f"SELECT * FROM {table} WHERE en = '{word}'")
+    # return selected word
+    return c.fetchone()
+
+
 def next_question(frame, word_list, remove_word=None):
     # Base condition
     if len(word_list) == 0:
@@ -50,4 +62,3 @@ def remove_question(word_list):
     word_list.remove(word_list[rand_index])
 
     return word_list
-

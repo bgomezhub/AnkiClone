@@ -19,9 +19,8 @@ class NounQuizPage:
         self.font_b = ('Arial', 14)
 
         # Select noun
-        word = word_list[0][word_list[1]][0]
-        self.noun = ''
-        self.select_noun(word)
+        word = word_list[0][word_list[1]][0]  # noun index
+        self.noun = QuizManager.select_word('noun', word)
         # Properties of noun
         self.gen = ctk.StringVar()
         self.plural = ctk.IntVar()
@@ -53,18 +52,6 @@ class NounQuizPage:
         # Define Input box
         self.nouns_table.append(ctk.CTkEntry(self.f_nouns_table, width=90))
         self.nouns_table[0].grid(column=3, row=1)
-        return
-
-    def select_noun(self, word):
-        # Select all in a list
-        # Connect to database
-        conn = sqlite3.connect('en_fr_words.db')
-        # Create cursor
-        c = conn.cursor()
-        # Select Table
-        c.execute(f"SELECT * FROM noun WHERE en = '{word}'")
-        # Retrieve word
-        self.noun = c.fetchone()
         return
 
     # Submit entries and receive feedback on performance

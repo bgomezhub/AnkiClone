@@ -21,8 +21,7 @@ class AdjectivesQuizPage:
 
         # Adjective
         word = word_list[0][word_list[1]][0]
-        self.adj = ''
-        self.select_adj(word)
+        self.adj = QuizManager.select_word('adjective', word)
 
         # Define & Display adjective table
         self.adj_table = []
@@ -47,18 +46,6 @@ class AdjectivesQuizPage:
             else:
                 self.adj_table.append(ctk.CTkEntry(self.f_adj_table))
                 self.adj_table[num].grid(column=1, row=num // 2)
-        return
-
-    def select_adj(self, word):
-        # Select all in a list
-        # Connect to database
-        conn = sqlite3.connect('en_fr_words.db')
-        # Create cursor
-        c = conn.cursor()
-        # Select Table
-        c.execute(f"SELECT * FROM adjective WHERE en = '{word}'")
-        # Choose random number & assign to conjugation
-        self.adj = c.fetchone()
         return
 
     # Submit entries and receive feedback on performance

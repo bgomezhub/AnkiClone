@@ -21,8 +21,7 @@ class ConjugationQuizPage:
 
         # conjugation
         word = word_list[0][word_list[1]][0]
-        self.conjugation = ''
-        self.select_conjugation(word)
+        self.conjugation = QuizManager.select_word('present_verb', word)
 
         # Define & Display conjugation table
         self.conjugation_table = []
@@ -47,19 +46,6 @@ class ConjugationQuizPage:
             else:
                 self.conjugation_table.append(ctk.CTkEntry(self.f_conjugation_table))
                 self.conjugation_table[num].grid(column=1, row=num//2)
-        return
-
-    def select_conjugation(self, word):
-        # Select all in a list
-        # Connect to database
-        conn = sqlite3.connect('en_fr_words.db')
-        # Create cursor
-        c = conn.cursor()
-        # Select Table
-        c.execute(f"SELECT * FROM present_verb WHERE en = '{word}'")
-        db_table = c.fetchall()
-        # Choose random number & assign to conjugation
-        self.conjugation = db_table[random.randint(0, len(db_table) - 1)]
         return
 
     # Submit entries and receive feedback on performance
