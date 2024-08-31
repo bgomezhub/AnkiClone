@@ -2,6 +2,7 @@
 import sqlite3
 import random
 import datetime
+import customtkinter as ctk
 # Import quiz Pages
 import ConjugationQuizPage
 import NounQuizPage
@@ -62,6 +63,35 @@ def remove_question(word_list):
     word_list.remove(word_list[rand_index])
 
     return word_list
+
+
+def build_table(table_frame, font, props, widgets_num):
+    table = []
+    for num in range(0, widgets_num):
+        if num % 2 == 0:
+            table.append(ctk.CTkLabel(table_frame, text=props[num // 2], font=font,  pady=12, padx=25))
+            table[num].grid(column=0, row=num // 2)
+        else:
+            table.append(ctk.CTkEntry(table_frame))
+            table[num].grid(column=1, row=num // 2)
+
+    return table
+
+
+def table_feedback(table_frame, table, font, word, widgets_num):
+    for entry in range(1, widgets_num, 2):
+        if table[entry].get() == word[-(-entry // 2)]:
+            feedback = ctk.CTkLabel(table_frame, text=table[entry].get(), font=font,
+                                    padx=25, pady=12, bg_color='#AAFFAA')  # Correct
+        else:
+            feedback = ctk.CTkLabel(table_frame, text=table[entry].get(), font=font,
+                                    padx=25, pady=12, bg_color='#FFAAAA')  # Incorrect
+            # Correct Label
+            ctk.CTkLabel(table_frame, text=word[-(-entry // 2)], font=font,
+                         padx=25, pady=12).grid(column=3, row=entry // 2)
+        # Delete Entry to replace with feedback label
+        table[entry].destroy()
+        feedback.grid(column=1, row=(entry // 2), sticky='WE')  # 'we' fills area of feedback with color
 
 
 def reset_quiz_manager(root_frame, word_list):
