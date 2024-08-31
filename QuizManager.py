@@ -62,3 +62,11 @@ def remove_question(word_list):
     word_list.remove(word_list[rand_index])
 
     return word_list
+
+
+def reset_quiz_manager(root_frame, word_list):
+    for widget in root_frame.winfo_children():
+        widget.destroy()
+
+    word_list = remove_question(word_list)
+    return next_question(root_frame, word_list)

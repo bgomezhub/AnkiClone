@@ -66,14 +66,6 @@ class AdjectivesQuizPage:
         # Replace button
         self.submit.destroy()
         done = ctk.CTkButton(self.f_submission, text="Next", font=self.font_b,
-                             command=lambda: self.return_quiz_manager(word_list))
+                             command=lambda: QuizManager.reset_quiz_manager(self.root_frame, word_list))
         done.grid(column=0, row=0, sticky='S', pady=20)
         return
-
-    # Destroy page and return to QuizManager.py
-    def return_quiz_manager(self, word_list):
-        for widget in self.root_frame.winfo_children():
-            widget.destroy()
-
-        word_list = QuizManager.remove_question(word_list)
-        return QuizManager.next_question(self.root_frame, word_list, self.adj)
