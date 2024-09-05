@@ -41,12 +41,28 @@ class ConjugationQuizPage:
 
     # Submit entries and receive feedback on performance
     def submission(self, word_list):
-        # Provide feedback
-        QuizManager.table_feedback(self.f_conjugation_table, self.conjugation_table, self.font_b, self.conjugation, 14)
+        # Display & track feedback
+        grade = QuizManager.table_feedback(
+            self.f_conjugation_table, self.conjugation_table, self.font_b, self.conjugation, 14)
+
+        word = word_list[0][word_list[1]][0]
+        # pts cap has not been hit
+        if QuizManager.get_pts_cap(word) == 0:
+            # Add pts, set pts cap
+            QuizManager.update_pts(word, grade)
 
         # Replace button
         self.submit.destroy()
-        done = ctk.CTkButton(self.f_submission, text="Next", font=self.font_b,
-                             command=lambda: QuizManager.reset_quiz_manager(self.root_frame, word_list))
+        done = ctk.CTkButton(self.f_submission, text="Next", font=self.font_b)
+
+        # 100% remove from list & set next due date
+        if grade == 1:
+            QuizManager.update_cooldown(word)
+            done.configure(command=lambda: QuizManager.reset_quiz_manager(self.root_frame, word_list))
+        else:
+            # Does not remove word from list
+            done.configure(command=lambda: QuizManager.reset_quiz_manager(self.root_frame, word_list, remove=False))
+
+        # Place button on screen
         done.grid(column=0, row=0, sticky='S', pady=20)
         return
