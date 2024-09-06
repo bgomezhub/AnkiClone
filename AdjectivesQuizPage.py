@@ -20,8 +20,8 @@ class AdjectivesQuizPage:
         self.font_b = ('Arial', 14)
 
         # Adjective
-        word = word_list[0][word_list[1]][0]
-        self.adj = QuizManager.select_word('adjective', word)
+        self.word = word_list[0][word_list[1]][0]
+        self.adj = QuizManager.select_word('adjective', self.word)
 
         # Define & Display adjective table
         self.adj_table = self.define_adj_table()
@@ -37,16 +37,22 @@ class AdjectivesQuizPage:
 
         # Build table
         adj_props = ['Masculine s.', 'Feminine s.', 'Masculine p.', 'Feminine p.']
+        # Return list of table widgets
         return QuizManager.build_table(self.f_adj_table, self.font_b, adj_props, 8)
 
     # Submit entries and receive feedback on performance
     def submission(self, word_list):
         # Provide feedback
-        QuizManager.table_feedback(self.f_adj_table, self.adj_table, self.font_b, self.adj, 8)
+        grade = QuizManager.table_feedback(self.f_adj_table, self.adj_table, self.font_b, self.adj, 8)
+
+        # pts cap has not been hit
+        if QuizManager.get_pts_cap(self.word) == 0:
+            # Add pts, set pts_cap
+            QuizManager.update_pts(self.word, grade)
 
         # Replace button
         self.submit.destroy()
-        done = ctk.CTkButton(self.f_submission, text="Next", font=self.font_b,
-                             command=lambda: QuizManager.reset_quiz_manager(self.root_frame, word_list))
-        done.grid(column=0, row=0, sticky='S', pady=20)
+        # Also handles cooldown
+        QuizManager.next_button(self.root_frame, self.f_submission, self.font_b, word_list, grade)
+
         return
