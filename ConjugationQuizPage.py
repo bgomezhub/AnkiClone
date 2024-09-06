@@ -20,8 +20,8 @@ class ConjugationQuizPage:
         self.font_b = ('Arial', 14)
 
         # conjugation
-        word = word_list[0][word_list[1]][0]
-        self.conjugation = QuizManager.select_word('present_verb', word)
+        self.word = word_list[0][word_list[1]][0]
+        self.conjugation = QuizManager.select_word('present_verb', self.word)
 
         # Define & Display conjugation table
         self.conjugation_table = self.define_conjugation_table()
@@ -53,16 +53,7 @@ class ConjugationQuizPage:
 
         # Replace button
         self.submit.destroy()
-        done = ctk.CTkButton(self.f_submission, text="Next", font=self.font_b)
+        # Also handles cooldown
+        QuizManager.next_button(self.root_frame, self.f_submission, self.font_b, word_list, grade)
 
-        # 100% remove from list & set next due date
-        if grade == 1:
-            QuizManager.update_cooldown(word)
-            done.configure(command=lambda: QuizManager.reset_quiz_manager(self.root_frame, word_list))
-        else:
-            # Does not remove word from list
-            done.configure(command=lambda: QuizManager.reset_quiz_manager(self.root_frame, word_list, remove=False))
-
-        # Place button on screen
-        done.grid(column=0, row=0, sticky='S', pady=20)
         return

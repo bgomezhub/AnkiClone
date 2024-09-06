@@ -27,7 +27,6 @@ def select_questions():
               f"WHERE cooldown <= {datetime.datetime.now().strftime('%Y%m%d')} AND new = 0")
     #word_list += c.fetchall()#
     word_list = c.fetchall()
-    print(word_list)
     return word_list
 
 
@@ -101,6 +100,23 @@ def table_feedback(table_frame, table, font, word, widgets_num):
         feedback.grid(column=1, row=(entry // 2), sticky='WE')  # 'we' fills area of feedback with color
 
     return grade/(widgets_num/2)
+
+
+def next_button(root_frame, sub_frame, font, word_list, grade):
+    # Replace button
+    done = ctk.CTkButton(sub_frame, text="Next", font=font)
+
+    # 100% remove from list & set next due date
+    if grade == 1:
+        update_cooldown(word_list[0][word_list[1]][0])
+        done.configure(command=lambda: reset_quiz_manager(root_frame, word_list))
+    else:
+        # Does not remove from word list
+        done.configure(command=lambda: reset_quiz_manager(root_frame, word_list, remove=False))
+
+    done.grid(column=0, row=0, sticky='S', pady=20)
+
+    return
 
 
 def get_pts_cap(word):
