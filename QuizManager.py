@@ -99,7 +99,7 @@ def table_feedback(table_frame, table, font, word, widgets_num):
         table[entry].destroy()
         feedback.grid(column=1, row=(entry // 2), sticky='WE')  # 'we' fills area of feedback with color
 
-    return grade/(widgets_num/2)
+    return grade/(widgets_num/2)  # percentage
 
 
 def next_button(root_frame, sub_frame, font, word_list, grade):

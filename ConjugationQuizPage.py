@@ -37,6 +37,7 @@ class ConjugationQuizPage:
 
         # Build table
         con_subjects = ['infinitive', 'Je', 'Tu', 'Il/Elle', 'Nous', 'Vous', 'Ils/Elles']
+        # Return list of table widgets
         return QuizManager.build_table(self.f_conjugation_table, self.font_b, con_subjects, 14)
 
     # Submit entries and receive feedback on performance
@@ -45,11 +46,10 @@ class ConjugationQuizPage:
         grade = QuizManager.table_feedback(
             self.f_conjugation_table, self.conjugation_table, self.font_b, self.conjugation, 14)
 
-        word = word_list[0][word_list[1]][0]
         # pts cap has not been hit
-        if QuizManager.get_pts_cap(word) == 0:
+        if QuizManager.get_pts_cap(self.word) == 0:
             # Add pts, set pts cap
-            QuizManager.update_pts(word, grade)
+            QuizManager.update_pts(self.word, grade)
 
         # Replace button
         self.submit.destroy()
