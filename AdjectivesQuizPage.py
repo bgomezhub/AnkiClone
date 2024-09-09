@@ -1,7 +1,4 @@
-import sqlite3
 import customtkinter as ctk
-
-import Home
 import QuizManager
 
 
@@ -21,24 +18,36 @@ class AdjectivesQuizPage:
 
         # Adjective
         self.word = word_list[0][word_list[1]][0]
+        self.is_new = QuizManager.get_new_info(self.word)
         self.adj = QuizManager.select_word('adjective', self.word)
 
         # Define & Display adjective table
         self.adj_table = self.define_adj_table()
 
-        # Submission
-        self.submit = ctk.CTkButton(
-            self.f_submission, text="Submit", font=self.font_b, command=lambda: self.submission(word_list))
-        self.submit.grid(column=0, row=8, columnspan=2, sticky='S', pady=20)
+        if self.is_new == 1:
+            # New word, no pts/cap/cooldown, skip updating
+            QuizManager.submission_new_word(self.root_frame, self.f_submission, self.font_b, word_list)
+        else:
+            # Submission
+            self.submit = ctk.CTkButton(self.f_submission, text="Submit", font=self.font_b,
+                                        command=lambda: self.submission(word_list))
+            self.submit.grid(column=0, row=8, columnspan=2, sticky='S', pady=20)
 
     def define_adj_table(self):
-        # Define adjective title
-        ctk.CTkLabel(self.f_question, text=self.adj[0], font=('Arial', 40)).grid(column=0, row=0)
-
         # Build table
         adj_props = ['Masculine s.', 'Feminine s.', 'Masculine p.', 'Feminine p.']
-        # Return list of table widgets
-        return QuizManager.build_table(self.f_adj_table, self.font_b, adj_props, 8)
+
+        if self.is_new == 1:
+            # Define adjective title
+            QuizManager.quiz_title(self.f_question, self.word, new=True)
+
+            # Word is new, build table w/o entries, do not need return
+            QuizManager.build_table_new_word(self.f_adj_table, self.font_b, adj_props, 8, word=self.adj)
+        else:
+            # Define adjective title
+            QuizManager.quiz_title(self.f_question, self.word)
+            # Return list of table widgets
+            return QuizManager.build_table(self.f_adj_table, self.font_b, adj_props, 8)
 
     # Submit entries and receive feedback on performance
     def submission(self, word_list):
@@ -48,7 +57,7 @@ class AdjectivesQuizPage:
         # pts cap has not been hit
         if QuizManager.get_pts_cap(self.word) == 0:
             # Add pts, set pts_cap
-            QuizManager.update_pts(self.word, grade)
+            QuizManager.set_pts(self.word, grade)
 
         # Replace button
         self.submit.destroy()
