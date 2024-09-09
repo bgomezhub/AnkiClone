@@ -1,6 +1,5 @@
-import sqlite3
 import customtkinter as ctk
-
+from tkinter import ttk
 import QuizManager
 
 
@@ -10,8 +9,8 @@ class NounQuizPage:
         self.root_frame = frame
         self.f_question = ctk.CTkFrame(frame)
         self.f_question.grid(column=0, row=0, padx=200, pady=75)
-        self.f_nouns_table = ctk.CTkFrame(frame)
-        self.f_nouns_table.grid(column=0, row=1, padx=200, pady=50)
+        self.f_noun_table = ctk.CTkFrame(frame)
+        self.f_noun_table.grid(column=0, row=1, padx=200, pady=50)
         self.f_submission = ctk.CTkFrame(frame)
         self.f_submission.grid(column=0, row=2, padx=200, pady=75)
 
@@ -20,97 +19,135 @@ class NounQuizPage:
 
         # Select noun
         self.word = word_list[0][word_list[1]][0]  # noun index
+        self.is_new = QuizManager.get_new_info(self.word)
         self.noun = QuizManager.select_word('noun', self.word)
+
         # Properties of noun
         self.gen = ctk.StringVar()
         self.plural = ctk.IntVar()
 
-        # Define & Display nouns table
-        self.nouns_table = []
-        self.define_nouns_table()
+        # Display new word or none new word
+        if self.is_new == 1:
+            # Define & Display nouns table
+            self.define_noun_table_new_word()
+            # New word, no pts/cap/cooldown
+            QuizManager.submission_new_word(self.root_frame, self.f_submission, self.font_b, word_list)
+        else:
+            # Define & Display nouns table
+            self.noun_table = []
+            self.define_noun_table()
+            # Submission
+            self.submit = ctk.CTkButton(self.f_submission, text="Submit",
+                                        command=lambda: self.submission(word_list))
+            self.submit.grid(column=0, row=2, columnspan=4, sticky='S', pady=20)
 
-        # Submission
-        self.submit = ctk.CTkButton(
-            self.f_submission, text="Submit", command=lambda: self.submission(word_list))
-        self.submit.grid(column=0, row=2, columnspan=4, sticky='S', pady=20)  # Padding between table & button
-
-    def define_nouns_table(self):
+    def define_noun_table(self):
         # Define noun table
         # Define noun
-        ctk.CTkLabel(self.f_question, text=self.noun[0], font=('Arial', 40)).grid(column=0, row=0)
+        QuizManager.quiz_title(self.f_question, self.word)
 
         # Define plurality
-        ctk.CTkCheckBox(self.f_nouns_table, text="Les", font=self.font_b,
+        ctk.CTkCheckBox(self.f_noun_table, text="Les", font=self.font_b,
                         variable=self.plural, onvalue=1, offvalue=0, width=90).grid(column=0, row=1)
 
         # Define gender
-        ctk.CTkRadioButton(self.f_nouns_table, text="Le", font=self.font_b,
+        ctk.CTkRadioButton(self.f_noun_table, text="Le", font=self.font_b,
                            variable=self.gen,  value='le', width=70).grid(column=1, row=1)
-        ctk.CTkRadioButton(self.f_nouns_table, text="La", font=self.font_b,
+        ctk.CTkRadioButton(self.f_noun_table, text="La", font=self.font_b,
                            variable=self.gen, value='la', width=70).grid(column=2, row=1)
 
         # Define Input box
-        self.nouns_table.append(ctk.CTkEntry(self.f_nouns_table, width=90))
-        self.nouns_table[0].grid(column=3, row=1)
+        self.noun_table.append(ctk.CTkEntry(self.f_noun_table, width=90))
+        self.noun_table[0].grid(column=3, row=1)
+        return
+
+    def define_noun_table_new_word(self):
+        # Define noun title
+        QuizManager.quiz_title(self.f_question, self.word, new=True)
+
+        # Get plurality from word, no SQL necessary since there is no info to gather.
+        if self.noun[-1] == 0:
+            ctk.CTkLabel(self.f_noun_table, text='Not Plural', font=self.font_b,
+                         padx=25, pady=12).grid(column=0, row=1)
+        else:
+            ctk.CTkLabel(self.f_noun_table, text='Plural', font=self.font_b,
+                         padx=25, pady=12).grid(column=0, row=1)
+
+        # Add separator
+        ttk.Separator(self.f_noun_table, orient='vertical').grid(column=1, row=1, sticky='ns')
+
+        # Get gender from word NO SQL
+        if self.noun[-2] == 'le':
+            ctk.CTkLabel(self.f_noun_table, text='Le', font=self.font_b,
+                         padx=25, pady=12).grid(column=2, row=1)
+        else:
+            ctk.CTkLabel(self.f_noun_table, text='La', font=self.font_b,
+                         padx=25, pady=12).grid(column=2, row=1)
+
+        # Add separator
+        ttk.Separator(self.f_noun_table, orient='vertical').grid(column=3, row=1, sticky='ns')
+
+        # Get word translation
+        ctk.CTkLabel(self.f_noun_table, text=self.noun[-3], font=self.font_b, padx=25, pady=12).grid(column=4, row=1)
         return
 
     # Submit entries and receive feedback on performance
     def submission(self, word_list):
         grade = 0
         # Check fr translation
-        if self.nouns_table[0].get() == self.noun[1]:
-            feedback = ctk.CTkLabel(self.f_nouns_table, text=self.nouns_table[0].get(), font=self.font_b,
+        if self.noun_table[0].get() == self.noun[1]:
+            feedback = ctk.CTkLabel(self.f_noun_table, text=self.noun_table[0].get(), font=self.font_b,
                                     padx=25, pady=12, bg_color='#AAFFAA')
             grade += 1
         else:
-            ctk.CTkLabel(self.f_nouns_table, text=self.noun[1], font=self.font_b,
+            ctk.CTkLabel(self.f_noun_table, text=self.noun[1], font=self.font_b,
                          padx=25, pady=12).grid(column=4, row=1)
-            feedback = ctk.CTkLabel(self.f_nouns_table, text=self.nouns_table[0].get(), font=self.font_b,
+            feedback = ctk.CTkLabel(self.f_noun_table, text=self.noun_table[0].get(), font=self.font_b,
                                     padx=25, pady=12, bg_color='#FFAAAA')
-        self.nouns_table[0].destroy()  # Clear Entry from screen
+        self.noun_table[0].destroy()  # Clear Entry from screen
         # Clear list to gather info to be displayed
-        self.nouns_table.clear()
-        self.nouns_table.append(feedback)
+        self.noun_table.clear()
+        self.noun_table.append(feedback)
 
         # Check gender
         # Correct
         if self.gen.get() == self.noun[-2]:
-            self.nouns_table.append(ctk.CTkLabel(self.f_nouns_table, text=self.noun[-2], font=self.font_b,
-                                                 padx=25, pady=12, bg_color='#AAFFAA'))
+            self.noun_table.append(ctk.CTkLabel(self.f_noun_table, text=self.noun[-2], font=self.font_b,
+                                                padx=25, pady=12, bg_color='#AAFFAA'))
             grade += 1
         # Incorrect
         else:
-            self.nouns_table.append(ctk.CTkLabel(self.f_nouns_table, text=self.gen.get(), font=self.font_b,
-                                                 padx=25, pady=12, bg_color='#FFAAAA'))
+            self.noun_table.append(ctk.CTkLabel(self.f_noun_table, text=self.gen.get(), font=self.font_b,
+                                                padx=25, pady=12, bg_color='#FFAAAA'))
 
         # Check Plurality
         # Correct
         if self.plural.get() == self.noun[-1]:
             if self.noun[-1] == 0:
-                self.nouns_table.append(ctk.CTkLabel(self.f_nouns_table, text="Not Plural", font=self.font_b,
-                                                     padx=25, pady=12, bg_color='#AAFFAA'))
+                self.noun_table.append(ctk.CTkLabel(self.f_noun_table, text="Not Plural", font=self.font_b,
+                                                    padx=25, pady=12, bg_color='#AAFFAA'))
             else:
-                self.nouns_table.append(ctk.CTkLabel(self.f_nouns_table, text="Plural", font=self.font_b,
-                                                     padx=25, pady=12, bg_color='#AAFFAA'))
+                self.noun_table.append(ctk.CTkLabel(self.f_noun_table, text="Plural", font=self.font_b,
+                                                    padx=25, pady=12, bg_color='#AAFFAA'))
             grade += 1
         # Incorrect
         else:
             if self.noun[-1] == 0:
-                self.nouns_table.append(ctk.CTkLabel(self.f_nouns_table, text="Plural", font=self.font_b,
-                                                     padx=25, pady=12, bg_color='#FFAAAA'))
+                self.noun_table.append(ctk.CTkLabel(self.f_noun_table, text="Plural", font=self.font_b,
+                                                    padx=25, pady=12, bg_color='#FFAAAA'))
             else:
-                self.nouns_table.append(ctk.CTkLabel(self.f_nouns_table, text="Not Plural", font=self.font_b,
-                                                     padx=25, pady=12, bg_color='#FFAAAA'))
+                self.noun_table.append(ctk.CTkLabel(self.f_noun_table, text="Not Plural", font=self.font_b,
+                                                    padx=25, pady=12, bg_color='#FFAAAA'))
 
         # Display feedback
         for i in range(-1, -4, -1):
-            self.nouns_table[i].grid(column=abs(i + 1), row=1, sticky='WE')
+            self.noun_table[i].grid(column=abs(i + 1), row=1, sticky='WE')
 
         grade = grade/3  # Percentage
         # pts cap has not been hit
         if QuizManager.get_pts_cap(self.word) == 0:
             # Add pts, set pts cap
-            QuizManager.update_pts(self.word, grade)
+            QuizManager.set_pts(self.word, grade)
 
         # Display Button
         self.submit.destroy()
