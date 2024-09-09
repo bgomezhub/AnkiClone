@@ -1,13 +1,10 @@
-import random
-import sqlite3
 import customtkinter as ctk
-
 import QuizManager
 
 
 class ConjugationQuizPage:
     def __init__(self, frame, word_list):
-        # Table Frame
+        # Declare Frames
         self.root_frame = frame
         self.f_question = ctk.CTkFrame(frame)
         self.f_question.grid(column=0, row=0, padx=200, pady=50)
@@ -21,24 +18,38 @@ class ConjugationQuizPage:
 
         # conjugation
         self.word = word_list[0][word_list[1]][0]
+        self.is_new = QuizManager.get_new_info(self.word)
         self.conjugation = QuizManager.select_word('present_verb', self.word)
 
         # Define & Display conjugation table
         self.conjugation_table = self.define_conjugation_table()
 
-        # Submission
-        self.submit = ctk.CTkButton(
-            self.f_submission, text="Submit", font=self.font_b, command=lambda: self.submission(word_list))
-        self.submit.grid(column=0, row=0, sticky='S', pady=20)
+        # Skip submission step for new words
+        if self.is_new == 1:
+            # New word, no pts/cap/cooldown
+            QuizManager.submission_new_word(self.root_frame, self.f_submission, self.font_b, word_list)
+        else:
+            # Submission
+            self.submit = ctk.CTkButton(self.f_submission, text="Submit", font=self.font_b,
+                                        command=lambda: self.submission(word_list))
+            self.submit.grid(column=0, row=0, sticky='S', pady=20)
 
     def define_conjugation_table(self):
-        # Define conjugation question (top)
-        ctk.CTkLabel(self.f_question, text=self.conjugation[0], font=("Arial", 40)).grid(column=0, row=0)
-
         # Build table
         con_subjects = ['infinitive', 'Je', 'Tu', 'Il/Elle', 'Nous', 'Vous', 'Ils/Elles']
-        # Return list of table widgets
-        return QuizManager.build_table(self.f_conjugation_table, self.font_b, con_subjects, 14)
+
+        if self.is_new == 1:
+            # Define conjugation question (top)
+            QuizManager.quiz_title(self.f_question, self.word, new=True)
+
+            # Word is new, build table w/o entries, do not need return
+            QuizManager.build_table_new_word(self.f_conjugation_table, self.font_b, con_subjects, 14,
+                                             word=self.conjugation)
+        else:
+            # Define conjugation question (top)
+            QuizManager.quiz_title(self.f_question, self.word)
+            # Return table widgets
+            return QuizManager.build_table(self.f_conjugation_table, self.font_b, con_subjects, 14)
 
     # Submit entries and receive feedback on performance
     def submission(self, word_list):
@@ -49,7 +60,7 @@ class ConjugationQuizPage:
         # pts cap has not been hit
         if QuizManager.get_pts_cap(self.word) == 0:
             # Add pts, set pts cap
-            QuizManager.update_pts(self.word, grade)
+            QuizManager.set_pts(self.word, grade)
 
         # Replace button
         self.submit.destroy()
