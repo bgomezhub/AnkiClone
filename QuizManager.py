@@ -3,6 +3,7 @@ import sqlite3
 import random
 import datetime
 import customtkinter as ctk
+from tkinter import ttk
 # Import quiz Pages
 import ConjugationQuizPage
 import NounQuizPage
@@ -18,15 +19,16 @@ def select_questions():
     c = conn.cursor()
 
     # Select new words
-    c.execute("SELECT * FROM word_info WHERE new = 1")
+    c.execute("SELECT word, type FROM word_info WHERE new = 1")
     # Add new words to quiz list
-    #word_list = c.fetchmany(1)#  # Temporary
+    word_list = c.fetchmany(2)  # Temporary
+    print(word_list)
 
     # Select due words
-    c.execute(f"Select * FROM word_info "
-              f"WHERE cooldown <= {datetime.datetime.now().strftime('%Y%m%d')} AND new = 0")
+    '''c.execute(f"Select word, type FROM word_info "
+              f"WHERE cooldown <= {datetime.datetime.now().strftime('%Y%m%d')} AND new = 0")'''
     #word_list += c.fetchall()#
-    word_list = c.fetchall()
+    #word_list = c.fetchall()
     return word_list
 
 
@@ -69,7 +71,15 @@ def remove_question(word_list, remove=True):
     return word_list
 
 
-def build_table(table_frame, font, props, widgets_num):
+def quiz_title(question_frame, word, new=False):
+    if new:
+        ctk.CTkLabel(question_frame, text="NEW", font=("Arial", 32), text_color='red').grid(column=0, row=0, pady=10)
+        ctk.CTkLabel(question_frame, text=word, font=("Arial", 40)).grid(column=0, row=1)
+    else:
+        ctk.CTkLabel(question_frame, text=word, font=("Arial", 40)).grid(column=0, row=0)
+
+
+def build_table(table_frame, font, props, widgets_num, word=None):
     table = []
     for num in range(0, widgets_num):
         if num % 2 == 0:
@@ -80,6 +90,18 @@ def build_table(table_frame, font, props, widgets_num):
             table[num].grid(column=1, row=num // 2)
 
     return table
+
+
+def build_table_new_word(table_frame, font, props, widgets_num, word):
+    for num in range(0, widgets_num):
+        if num % 2 == 0:
+            ctk.CTkLabel(table_frame, text=props[num // 2], font=font,  pady=12, padx=25).grid(column=0, row=num)
+        else:
+            ctk.CTkLabel(table_frame, text=word[num // 2 + 1], font=font, pady=12, padx=25).grid(column=1, row=num - 1)
+            ttk.Separator(table_frame, orient='horizontal').grid(column=0, row=num, sticky='ew')
+            ttk.Separator(table_frame, orient='horizontal').grid(column=1, row=num, sticky='ew')
+
+    return
 
 
 def table_feedback(table_frame, table, font, word, widgets_num):
@@ -119,6 +141,18 @@ def next_button(root_frame, sub_frame, font, word_list, grade):
     return
 
 
+def submission_new_word(root_frame, sub_frame, font, word_list):
+    # Removes word from new
+    set_new_info(word_list[0][word_list[1]][0])
+
+    # Create button to leave page
+    done = ctk.CTkButton(sub_frame, text="Next", font=font)
+    # Does not remove from word list
+    done.configure(command=lambda: reset_quiz_manager(root_frame, word_list, remove=False))
+    done.grid(column=0, row=0, sticky='S', pady=20)
+    return
+
+
 def get_pts_cap(word):
     # Connect to database
     conn = sqlite3.connect('en_fr_words.db')
@@ -129,7 +163,29 @@ def get_pts_cap(word):
     return c.fetchone()[0]  # Fetchone returns tuple with a null at end
 
 
-def update_pts(word, pts):
+def get_new_info(word):
+    # Connect to database
+    conn = sqlite3.connect('en_fr_words.db')
+    # Create cursor
+    c = conn.cursor()
+    c.execute(f"SELECT new FROM word_info WHERE word = '{word}'")
+
+    return c.fetchone()[0]  # Fetchone returns tuple with a null at end
+
+
+def set_new_info(word):
+    # Connect to database
+    conn = sqlite3.connect('en_fr_words.db')
+    # Create cursor
+    c = conn.cursor()
+    c.execute(f"UPDATE word_info SET new = 0 WHERE word = '{word}'")
+    # Commit changes and close db
+    conn.commit()
+    conn.close()
+    return
+
+
+def set_pts(word, pts):
     # Select all in a list
     # Connect to database
     conn = sqlite3.connect('en_fr_words.db')
@@ -143,7 +199,7 @@ def update_pts(word, pts):
     if not (c.fetchone()[0] < 0 and pts < 0):
         c.execute(f"UPDATE word_info SET pts = (pts + {pts}) WHERE word = '{word}'")
 
-    #
+    # Set pts_cap
     c.execute(f"UPDATE word_info SET pts_cap = 1 WHERE word = '{word}'")
     # Commit changes and close db
     conn.commit()
