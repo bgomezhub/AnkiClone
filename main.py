@@ -1,10 +1,13 @@
 import customtkinter as ctk
-
+import json
 import Home
 
-# Define attributes of CTK
-ctk.set_appearance_mode("light")
-ctk.set_default_color_theme("themes/mytheme.json")
+with open("settings.json", 'r') as file:
+    settings = json.load(file)
+
+# Define attributes of CTK from settings
+ctk.set_appearance_mode(settings['appearance'])
+ctk.set_default_color_theme(f"themes/{settings['color']}.json")
 
 # Define root widget
 root = ctk.CTk()
