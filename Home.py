@@ -1,19 +1,23 @@
 import customtkinter as ctk
-
 import QuizManager
+import SettingsPage
 
 
 class Home:
     def __init__(self, frame):
         # Title
         self.f_home_title = ctk.CTkFrame(frame)
-        self.f_home_title.pack(padx=200, pady=100)
-        ctk.CTkLabel(self.f_home_title, text='Welcome', font=('Arial', 40)).pack()
+        self.f_home_title.pack(padx=200, pady=90)
+        ctk.CTkLabel(self.f_home_title, text='Welcome', font=('Roboto', 40)).pack()
         # Type of Quiz
         self.f_home_options = ctk.CTkFrame(frame)
-        self.f_home_options.pack(padx=200, pady=100)
-        ctk.CTkButton(self.f_home_options, text='Quiz', font=('Arial', 18),
-               command=lambda: self.submission(frame, 'quiz')).grid(column=0, row=0)
+        self.f_home_options.pack(padx=200, pady=90)
+        ctk.CTkButton(self.f_home_options, text='Quiz', font=('Roboto', 18),
+                      command=lambda: self.submission(frame, 'quiz')).grid(column=0, row=0, pady=12)
+        ctk.CTkButton(self.f_home_options, text='Word Lists', font=('Arial', 18),
+                      command=lambda: self.submission(frame, 'quiz')).grid(column=0, row=1, pady=12)
+        ctk.CTkButton(self.f_home_options, text='Settings', font=('Arial', 18),
+                      command=lambda: self.submission(frame, 'settings')).grid(column=0, row=2, pady=12)
 
     def submission(self, frame, option):
         # destroy all objects of home page
@@ -23,3 +27,5 @@ class Home:
         if option == 'quiz':
             word_list = QuizManager.select_questions()
             QuizManager.next_question(frame, word_list)
+        elif option == 'settings':
+            SettingsPage.SettingsPage(frame)

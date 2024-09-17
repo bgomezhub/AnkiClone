@@ -13,9 +13,6 @@ class AdjectivesQuizPage:
         self.f_submission = ctk.CTkFrame(frame)
         self.f_submission.grid(column=0, row=2, padx=200, pady=75)
 
-        # Font for body
-        self.font_b = ('Arial', 14)
-
         # Adjective
         self.word = word_list[0][word_list[1]][0]
         self.is_new = QuizManager.get_new_info(self.word)
@@ -26,11 +23,10 @@ class AdjectivesQuizPage:
 
         if self.is_new == 1:
             # New word, no pts/cap/cooldown, skip updating
-            QuizManager.submission_new_word(self.root_frame, self.f_submission, self.font_b, word_list)
+            QuizManager.submission_new_word(self.root_frame, self.f_submission, word_list)
         else:
             # Submission
-            self.submit = ctk.CTkButton(self.f_submission, text="Submit", font=self.font_b,
-                                        command=lambda: self.submission(word_list))
+            self.submit = ctk.CTkButton(self.f_submission, text="Submit", command=lambda: self.submission(word_list))
             self.submit.grid(column=0, row=8, columnspan=2, sticky='S', pady=20)
 
     def define_adj_table(self):
@@ -42,17 +38,17 @@ class AdjectivesQuizPage:
             QuizManager.quiz_title(self.f_question, self.word, new=True)
 
             # Word is new, build table w/o entries, do not need return
-            QuizManager.build_table_new_word(self.f_adj_table, self.font_b, adj_props, 8, word=self.adj)
+            QuizManager.build_table_new_word(self.f_adj_table, adj_props, 8, word=self.adj)
         else:
             # Define adjective title
             QuizManager.quiz_title(self.f_question, self.word)
             # Return list of table widgets
-            return QuizManager.build_table(self.f_adj_table, self.font_b, adj_props, 8)
+            return QuizManager.build_table(self.f_adj_table, adj_props, 8)
 
     # Submit entries and receive feedback on performance
     def submission(self, word_list):
         # Provide feedback
-        grade = QuizManager.table_feedback(self.f_adj_table, self.adj_table, self.font_b, self.adj, 8)
+        grade = QuizManager.table_feedback(self.f_adj_table, self.adj_table, self.adj, 8)
 
         # pts cap has not been hit
         if QuizManager.get_pts_cap(self.word) == 0:
@@ -62,6 +58,6 @@ class AdjectivesQuizPage:
         # Replace button
         self.submit.destroy()
         # Also handles cooldown
-        QuizManager.next_button(self.root_frame, self.f_submission, self.font_b, word_list, grade)
+        QuizManager.next_button(self.root_frame, self.f_submission, word_list, grade)
 
         return

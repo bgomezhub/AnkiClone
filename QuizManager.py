@@ -19,14 +19,15 @@ def select_questions():
     c = conn.cursor()
 
     # Select new words
-    c.execute("SELECT word, type FROM word_info WHERE new = 1")
+    # c.execute("SELECT word, type FROM word_info WHERE new = 1")
     # Add new words to quiz list
-    word_list = c.fetchmany(2)  # Temporary
-    print(word_list)
+    #word_list = c.fetchmany(2)  # Temporary
 
     # Select due words
-    '''c.execute(f"Select word, type FROM word_info "
-              f"WHERE cooldown <= {datetime.datetime.now().strftime('%Y%m%d')} AND new = 0")'''
+    c.execute(f"Select word, type FROM word_info "
+              f"WHERE cooldown <= {datetime.datetime.now().strftime('%Y%m%d')} AND new = 0")
+    word_list = c.fetchmany(3)
+    print(word_list)
     #word_list += c.fetchall()#
     #word_list = c.fetchall()
     return word_list
@@ -73,17 +74,17 @@ def remove_question(word_list, remove=True):
 
 def quiz_title(question_frame, word, new=False):
     if new:
-        ctk.CTkLabel(question_frame, text="NEW", font=("Arial", 32), text_color='red').grid(column=0, row=0, pady=10)
-        ctk.CTkLabel(question_frame, text=word, font=("Arial", 40)).grid(column=0, row=1)
+        ctk.CTkLabel(question_frame, text="NEW", font=("Roboto", 32), text_color='red').grid(column=0, row=0, pady=10)
+        ctk.CTkLabel(question_frame, text=word, font=("Roboto", 40)).grid(column=0, row=1)
     else:
-        ctk.CTkLabel(question_frame, text=word, font=("Arial", 40)).grid(column=0, row=0)
+        ctk.CTkLabel(question_frame, text=word, font=("Roboto", 40)).grid(column=0, row=0)
 
 
-def build_table(table_frame, font, props, widgets_num, word=None):
+def build_table(table_frame, props, widgets_num, word=None):
     table = []
     for num in range(0, widgets_num):
         if num % 2 == 0:
-            table.append(ctk.CTkLabel(table_frame, text=props[num // 2], font=font,  pady=12, padx=25))
+            table.append(ctk.CTkLabel(table_frame, text=props[num // 2], pady=12, padx=25))
             table[num].grid(column=0, row=num // 2)
         else:
             table.append(ctk.CTkEntry(table_frame))
@@ -92,31 +93,30 @@ def build_table(table_frame, font, props, widgets_num, word=None):
     return table
 
 
-def build_table_new_word(table_frame, font, props, widgets_num, word):
+def build_table_new_word(table_frame, props, widgets_num, word):
     for num in range(0, widgets_num):
         if num % 2 == 0:
-            ctk.CTkLabel(table_frame, text=props[num // 2], font=font,  pady=12, padx=25).grid(column=0, row=num)
+            ctk.CTkLabel(table_frame, text=props[num // 2], pady=12, padx=25).grid(column=0, row=num)
         else:
-            ctk.CTkLabel(table_frame, text=word[num // 2 + 1], font=font, pady=12, padx=25).grid(column=1, row=num - 1)
+            ctk.CTkLabel(table_frame, text=word[num // 2 + 1], pady=12, padx=25).grid(column=1, row=num - 1)
             ttk.Separator(table_frame, orient='horizontal').grid(column=0, row=num, sticky='ew')
             ttk.Separator(table_frame, orient='horizontal').grid(column=1, row=num, sticky='ew')
 
     return
 
 
-def table_feedback(table_frame, table, font, word, widgets_num):
+def table_feedback(table_frame, table, word, widgets_num):
     grade = 0
     for entry in range(1, widgets_num, 2):
         if table[entry].get() == word[-(-entry // 2)]:
-            feedback = ctk.CTkLabel(table_frame, text=table[entry].get(), font=font,
-                                    padx=25, pady=12, bg_color='#AAFFAA')  # Correct
+            # Correct
+            feedback = ctk.CTkLabel(table_frame, text=table[entry].get(), padx=25, pady=12, bg_color='#AAFFAA')
             grade += 1
         else:
-            feedback = ctk.CTkLabel(table_frame, text=table[entry].get(), font=font,
-                                    padx=25, pady=12, bg_color='#FFAAAA')  # Incorrect
+            # Incorrect
+            feedback = ctk.CTkLabel(table_frame, text=table[entry].get(), padx=25, pady=12, bg_color='#FFAAAA')
             # Correct Label
-            ctk.CTkLabel(table_frame, text=word[-(-entry // 2)], font=font,
-                         padx=25, pady=12).grid(column=3, row=entry // 2)
+            ctk.CTkLabel(table_frame, text=word[-(-entry // 2)], padx=25, pady=12).grid(column=3, row=entry // 2)
         # Delete Entry to replace with feedback label
         table[entry].destroy()
         feedback.grid(column=1, row=(entry // 2), sticky='WE')  # 'we' fills area of feedback with color
@@ -124,9 +124,9 @@ def table_feedback(table_frame, table, font, word, widgets_num):
     return grade/(widgets_num/2)  # percentage
 
 
-def next_button(root_frame, sub_frame, font, word_list, grade):
+def next_button(root_frame, sub_frame, word_list, grade):
     # Replace button
-    done = ctk.CTkButton(sub_frame, text="Next", font=font)
+    done = ctk.CTkButton(sub_frame, text="Next")
 
     # 100% remove from list & set next due date
     if grade == 1:
@@ -141,12 +141,12 @@ def next_button(root_frame, sub_frame, font, word_list, grade):
     return
 
 
-def submission_new_word(root_frame, sub_frame, font, word_list):
+def submission_new_word(root_frame, sub_frame, word_list):
     # Removes word from new
     set_new_info(word_list[0][word_list[1]][0])
 
     # Create button to leave page
-    done = ctk.CTkButton(sub_frame, text="Next", font=font)
+    done = ctk.CTkButton(sub_frame, text="Next")
     # Does not remove from word list
     done.configure(command=lambda: reset_quiz_manager(root_frame, word_list, remove=False))
     done.grid(column=0, row=0, sticky='S', pady=20)
