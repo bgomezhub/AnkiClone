@@ -2,25 +2,28 @@ import json
 
 import customtkinter as ctk
 import Home
+import QuizManager
 
 
 class SettingsPage:
     def __init__(self, frame):
+        self.root_frame = frame
         # Title
         self.f_title = ctk.CTkFrame(frame)
         self.f_title.pack(padx=200, pady=50)
-        ctk.CTkLabel(self.f_title, text='Settings', font=('Arial', 40)).pack()
+        ctk.CTkLabel(self.f_title, text='Settings', font=QuizManager.get_title_font()).pack()
         # Handle Setting Options
         self.f_setting_options = ctk.CTkFrame(frame)
-        self.f_setting_options.pack(padx=200, pady=100)
+        self.f_setting_options.pack(padx=200, pady=50)
         # Submission frame
         self.f_submission = ctk.CTkFrame(frame)
+        self.f_submission.pack(padx=200, pady=50)
 
         self.options()
 
         # Return to Home
-        ctk.CTkButton(self.f_submission, text='Done', font=('Arial', 18),
-                      command=lambda: self.submission(frame)).grid(column=0, row=0)
+        ctk.CTkButton(self.f_submission, text='Done', font=('Roboto', 20),
+                      command=lambda: self.submission(frame)).grid(column=0, row=0, sticky='N')
 
     def options(self):
         # Open settings

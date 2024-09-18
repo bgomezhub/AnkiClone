@@ -1,4 +1,5 @@
 # Import python files
+import json
 import sqlite3
 import random
 import datetime
@@ -19,13 +20,13 @@ def select_questions():
     c = conn.cursor()
 
     # Select new words
-    # c.execute("SELECT word, type FROM word_info WHERE new = 1")
+    c.execute("SELECT word, type FROM word_info WHERE new = 1")
     # Add new words to quiz list
     #word_list = c.fetchmany(2)  # Temporary
 
     # Select due words
-    c.execute(f"Select word, type FROM word_info "
-              f"WHERE cooldown <= {datetime.datetime.now().strftime('%Y%m%d')} AND new = 0")
+    '''c.execute(f"Select word, type FROM word_info "
+              f"WHERE cooldown <= {datetime.datetime.now().strftime('%Y%m%d')} AND new = 0")'''
     word_list = c.fetchmany(3)
     print(word_list)
     #word_list += c.fetchall()#
@@ -72,12 +73,28 @@ def remove_question(word_list, remove=True):
     return word_list
 
 
+def get_title_font():
+    # Get theme & size info
+    with open("settings.json", 'r') as file:
+        settings = json.load(file)
+    file.close()
+
+    # Get font family
+    with open(f"themes/{settings['color']}.json", 'r') as file:
+        font_family = json.load(file)['CTkFont']['Windows']['family']
+    file.close()
+
+    return tuple((font_family, settings['title_size']))
+
+
 def quiz_title(question_frame, word, new=False):
+    title_font = get_title_font()
     if new:
-        ctk.CTkLabel(question_frame, text="NEW", font=("Roboto", 32), text_color='red').grid(column=0, row=0, pady=10)
-        ctk.CTkLabel(question_frame, text=word, font=("Roboto", 40)).grid(column=0, row=1)
+        ctk.CTkLabel(question_frame, text="NEW", font=(title_font[0], title_font[1] - 10),
+                     text_color='red').grid(column=0, row=0, pady=10)
+        ctk.CTkLabel(question_frame, text=word, font=title_font).grid(column=0, row=1)
     else:
-        ctk.CTkLabel(question_frame, text=word, font=("Roboto", 40)).grid(column=0, row=0)
+        ctk.CTkLabel(question_frame, text=word, font=title_font).grid(column=0, row=0)
 
 
 def build_table(table_frame, props, widgets_num, word=None):

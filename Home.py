@@ -1,3 +1,5 @@
+import json
+
 import customtkinter as ctk
 import QuizManager
 import SettingsPage
@@ -8,15 +10,15 @@ class Home:
         # Title
         self.f_home_title = ctk.CTkFrame(frame)
         self.f_home_title.pack(padx=200, pady=90)
-        ctk.CTkLabel(self.f_home_title, text='Welcome', font=('Roboto', 40)).pack()
+        ctk.CTkLabel(self.f_home_title, text='Welcome', font=QuizManager.get_title_font()).pack()
         # Type of Quiz
         self.f_home_options = ctk.CTkFrame(frame)
         self.f_home_options.pack(padx=200, pady=90)
-        ctk.CTkButton(self.f_home_options, text='Quiz', font=('Roboto', 18),
+        ctk.CTkButton(self.f_home_options, text='Quiz', font=('Roboto', 20),
                       command=lambda: self.submission(frame, 'quiz')).grid(column=0, row=0, pady=12)
-        ctk.CTkButton(self.f_home_options, text='Word Lists', font=('Arial', 18),
+        ctk.CTkButton(self.f_home_options, text='Word Lists', font=('Roboto', 20),
                       command=lambda: self.submission(frame, 'quiz')).grid(column=0, row=1, pady=12)
-        ctk.CTkButton(self.f_home_options, text='Settings', font=('Arial', 18),
+        ctk.CTkButton(self.f_home_options, text='Settings', font=('Roboto', 20),
                       command=lambda: self.submission(frame, 'settings')).grid(column=0, row=2, pady=12)
 
     def submission(self, frame, option):
