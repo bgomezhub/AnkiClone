@@ -128,15 +128,26 @@ def build_table_new_word(table_frame, font_body, props, widgets_num, word):
 
 
 def table_feedback(table_frame, font_body, table, word, widgets_num):
+    # Open settings for feedback colors dependent on program appearance (light/dark)
+    with open("settings.json", 'r') as file:
+        settings = json.load(file)
+    file.close()
+
+    if settings["appearance"] == 'light':
+        colors = settings["correct_feedback"][0], settings['incorrect_feedback'][0]
+    else:
+        colors = settings["correct_feedback"][1], settings['incorrect_feedback'][1]
+
+
     grade = 0
     for entry in range(1, widgets_num, 2):
         if table[entry].get() == word[-(-entry // 2)]:
             # Correct
-            feedback = ctk.CTkLabel(table_frame, text=table[entry].get(), font=font_body, padx=25, pady=12, bg_color='#AAFFAA')
+            feedback = ctk.CTkLabel(table_frame, text=table[entry].get(), font=font_body, padx=25, pady=12, bg_color=colors[0])
             grade += 1
         else:
             # Incorrect
-            feedback = ctk.CTkLabel(table_frame, text=table[entry].get(), font=font_body, padx=25, pady=12, bg_color='#FFAAAA')
+            feedback = ctk.CTkLabel(table_frame, text=table[entry].get(), font=font_body, padx=25, pady=12, bg_color=colors[1])
             # Correct Label
             ctk.CTkLabel(table_frame, text=word[-(-entry // 2)], font=font_body, padx=25, pady=12).grid(column=3, row=entry // 2)
         # Delete Entry to replace with feedback label
