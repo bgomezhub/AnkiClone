@@ -1,3 +1,5 @@
+import json
+
 import customtkinter as ctk
 from tkinter import ttk
 import QuizManager
@@ -90,16 +92,26 @@ class NounQuizPage:
 
     # Submit entries and receive feedback on performance
     def submission(self, word_list):
+        # Open settings for feedback colors dependent on program appearance (light/dark)
+        with open("settings.json", 'r') as file:
+            settings = json.load(file)
+        file.close()
+
+        if settings["appearance"] == 'light':
+            colors = settings["correct_feedback"][0], settings['incorrect_feedback'][0]
+        else:
+            colors = settings["correct_feedback"][1], settings['incorrect_feedback'][1]
+
         grade = 0
         # Check fr translation
         if self.noun_table[0].get() == self.noun[1]:
             feedback = ctk.CTkLabel(self.f_noun_table, text=self.noun_table[0].get(), font=self.font_body,
-                                    padx=25, pady=12, bg_color='#AAFFAA')
+                                    padx=25, pady=12, bg_color=colors[0])
             grade += 1
         else:
             ctk.CTkLabel(self.f_noun_table, text=self.noun[1], font=self.font_body, padx=25, pady=12).grid(column=4, row=1)
             feedback = ctk.CTkLabel(self.f_noun_table, text=self.noun_table[0].get(), font=self.font_body,
-                                    padx=25, pady=12, bg_color='#FFAAAA')
+                                    padx=25, pady=12, bg_color=colors[1])
         self.noun_table[0].destroy()  # Clear Entry from screen
         # Clear list to gather info to be displayed
         self.noun_table.clear()
@@ -109,31 +121,31 @@ class NounQuizPage:
         # Correct
         if self.gen.get() == self.noun[-2]:
             self.noun_table.append(ctk.CTkLabel(self.f_noun_table, text=self.noun[-2], font=self.font_body,
-                                                padx=25, pady=12, bg_color='#AAFFAA'))
+                                                padx=25, pady=12, bg_color=colors[0]))
             grade += 1
         # Incorrect
         else:
             self.noun_table.append(ctk.CTkLabel(self.f_noun_table, text=self.gen.get(), font=self.font_body,
-                                                padx=25, pady=12, bg_color='#FFAAAA'))
+                                                padx=25, pady=12, bg_color=colors[1]))
 
         # Check Plurality
         # Correct
         if self.plural.get() == self.noun[-1]:
             if self.noun[-1] == 0:
                 self.noun_table.append(ctk.CTkLabel(self.f_noun_table, text="Not Plural", font=self.font_body,
-                                                    padx=25, pady=12, bg_color='#AAFFAA'))
+                                                    padx=25, pady=12, bg_color=colors[0]))
             else:
                 self.noun_table.append(ctk.CTkLabel(self.f_noun_table, text="Plural", font=self.font_body,
-                                                    padx=25, pady=12, bg_color='#AAFFAA'))
+                                                    padx=25, pady=12, bg_color=colors[0]))
             grade += 1
         # Incorrect
         else:
             if self.noun[-1] == 0:
                 self.noun_table.append(ctk.CTkLabel(self.f_noun_table, text="Plural", font=self.font_body,
-                                                    padx=25, pady=12, bg_color='#FFAAAA'))
+                                                    padx=25, pady=12, bg_color=colors[1]))
             else:
                 self.noun_table.append(ctk.CTkLabel(self.f_noun_table, text="Not Plural", font=self.font_body,
-                                                    padx=25, pady=12, bg_color='#FFAAAA'))
+                                                    padx=25, pady=12, bg_color=colors[1]))
 
         # Display feedback
         for i in range(-1, -4, -1):
