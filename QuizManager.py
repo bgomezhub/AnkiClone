@@ -73,7 +73,7 @@ def remove_question(word_list, remove=True):
     return word_list
 
 
-def get_title_font():
+def get_fonts(body=True):
     # Get theme & size info
     with open("settings.json", 'r') as file:
         settings = json.load(file)
@@ -81,23 +81,29 @@ def get_title_font():
 
     # Get font family
     with open(f"themes/{settings['color']}.json", 'r') as file:
-        font_family = json.load(file)['CTkFont']['Windows']['family']
+        theme = json.load(file)
     file.close()
 
-    return tuple((font_family, settings['title_size']))
+    font_family = theme['CTkFont']['Windows']['family']
+
+    # Return body or title size
+    font_size_body = theme['CTkFont']['Windows']['size']
+    font_size_title = theme['CTkFont']['Windows']['title_size']
+
+    return tuple((font_family, font_size_title, font_size_body))
 
 
 def quiz_title(question_frame, word, new=False):
-    title_font = get_title_font()
+    fonts = get_fonts(body=False)
     if new:
-        ctk.CTkLabel(question_frame, text="NEW", font=(title_font[0], title_font[1] - 10),
+        ctk.CTkLabel(question_frame, text="NEW", font=(fonts[0], fonts[1] - 10),
                      text_color='red').grid(column=0, row=0, pady=10)
-        ctk.CTkLabel(question_frame, text=word, font=title_font).grid(column=0, row=1)
+        ctk.CTkLabel(question_frame, text=word, font=(fonts[0], fonts[1])).grid(column=0, row=1)
     else:
-        ctk.CTkLabel(question_frame, text=word, font=title_font).grid(column=0, row=0)
+        ctk.CTkLabel(question_frame, text=word, font=(fonts[0], fonts[1])).grid(column=0, row=0)
 
 
-def build_table(table_frame, props, widgets_num, word=None):
+def build_table(table_frame, props, widgets_num):
     table = []
     for num in range(0, widgets_num):
         if num % 2 == 0:
