@@ -1,4 +1,5 @@
 import json
+from tkinter.ttk import Button
 
 import customtkinter as ctk
 import Home
@@ -29,7 +30,7 @@ class SettingsPage:
         self.options()
 
         # Return to Home
-        ctk.CTkButton(self.f_submission, text='Done', font=('Roboto', 20),
+        ctk.CTkButton(self.f_submission, text='Done', font=self.font_body,
                       command=lambda: self.submission(frame)).grid(column=0, row=0, sticky='N')
 
     def options(self):
@@ -39,14 +40,14 @@ class SettingsPage:
         file.close()
 
         # Set font sizes
-        ctk.CTkLabel(self.f_setting_options, text="Title Font:", font=self.font_body).grid(column=0, row=0)
-        self.title_spinbox.grid(column=1, row=0, pady=11)
+        ctk.CTkLabel(self.f_setting_options, text="Title Font:", font=self.font_body).grid(column=0, row=0, columnspan=2)
+        self.title_spinbox.grid(column=2, row=0, pady=11, columnspan=2)
 
-        ctk.CTkLabel(self.f_setting_options, text="Body Font:", font=self.font_body).grid(column=0, row=1)
-        self.body_spinbox.grid(column=1, row=1, pady=11)
+        ctk.CTkLabel(self.f_setting_options, text="Body Font:", font=self.font_body).grid(column=0, row=1, columnspan=2)
+        self.body_spinbox.grid(column=2, row=1, pady=11, columnspan=2)
 
         # Toggle dark/light mode
-        ctk.CTkLabel(self.f_setting_options, text="Appearance (Dark/Light):", font=self.font_body).grid(column=0, row=2)
+        ctk.CTkLabel(self.f_setting_options, text="Appearance (Dark/Light):", font=self.font_body).grid(column=0, row=2, columnspan=2)
         if settings['appearance'] == 'light':
             switch_var = ctk.StringVar(value="on")
         else:
@@ -54,10 +55,15 @@ class SettingsPage:
         appearance_switch = ctk.CTkSwitch(self.f_setting_options, text='', onvalue='on', offvalue='off',
                                           font=self.font_body, command=lambda: self.set_appearance_mode(switch_var),
                                           variable=switch_var)
-        appearance_switch.grid(column=1, row=2, pady=11, padx=10)
+        appearance_switch.grid(column=2, row=2, pady=11, padx=10, columnspan=2)
+
+        # Add spacing between appearance and color options
+        ctk.CTkLabel(self.f_setting_options, text='', font=self.font_body).grid(column=0, row=3, columnspan=4)
 
         # Set color of program
-        ctk.CTkLabel(self.f_setting_options, text="Color:", font=self.font_body).grid(column=0, row=3)
+        ctk.CTkLabel(self.f_setting_options, text="Color", font=self.font_body).grid(column=0, row=4, columnspan=4)
+        self.color_options()
+
 
     def spinbox(self, font_type):
         # Create frame to house all widgets
@@ -153,6 +159,7 @@ class SettingsPage:
         # Open settings
         with open('settings.json', 'r') as file:
             settings = json.load(file)
+        file.close()
 
         # Change value in settings
         if switch_var.get() == 'on':
@@ -163,9 +170,48 @@ class SettingsPage:
         # Write it into settings.json to be remembered on startup of program
         with open('settings.json', 'w') as file:
             json.dump(settings, file)
+        file.close()
 
         # Change the appearance now
         ctk.set_appearance_mode(settings['appearance'])
+
+    def color_options(self):
+        # Open settings
+        with open('settings.json', 'r') as file:
+            settings = json.load(file)
+        file.close()
+
+        current_color = settings['color']
+        with open(f"themes/{current_color}.json", 'r') as file:
+            theme = json.load(file)
+        file.close()
+
+        appearance = settings['appearance']
+        # Set light or dark colors
+        if appearance == 'light':
+            color_options = ['#3a7ebf', '#00bbbb', '#2CC985', '#EE9F00', '#F8486D', '#682cc9', '#DD2222', '#CCCC22']
+            current_color = theme['CTkButton']['fg_color'][0]
+        else:
+            color_options = ['#1f538d', '#00aaaa', '#2FA572', '#DD9F00', '#F04660', '#682fa5', '#DD1616', '#CCCC0F']
+            current_color = theme['CTkButton']['fg_color'][1]
+
+        # Create buttons
+        i = 0
+        selected_button = []
+        for color in color_options:
+            temp = ctk.CTkButton(self.f_setting_options, text=' ', font=self.font_body, fg_color=color,
+                                 command=lambda: self.set_color(color, selected_button), hover=False)
+            temp.grid(column=(i % 4), row=(i // 4 + 5), padx=1, pady=1, sticky='ew')
+
+            # Add border to current selected button
+            if color == current_color:
+                temp.configure(border_width=(self.font_body.cget("size")//10 + 2))
+                selected_button.append(temp)
+            i += 1
+
+    def set_color(self, color_selected, past_selected):
+        print(past_selected[0].cget("fg_color"))
+        return
 
     def submission(self, root_frame):
         for widget in root_frame.winfo_children():
