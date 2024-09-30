@@ -1,1 +1,13 @@
-{"daily_word_limit": 5, "appearance": "dark", "color": "blue", "correct_feedback": ["#AAFFAA", "#22AA22"], "incorrect_feedback": ["#FFAAAA", "#AA2222"]}
+{
+  "daily_word_limit": 5,
+  "appearance": "light",
+  "color": "blue",
+  "correct_feedback": [
+    "#AAFFAA",
+    "#22AA22"
+  ],
+  "incorrect_feedback": [
+    "#FFAAAA",
+    "#AA2222"
+  ]
+}
