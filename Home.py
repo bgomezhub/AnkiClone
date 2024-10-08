@@ -1,7 +1,6 @@
-import json
-
 import customtkinter as ctk
 import QuizManager
+import WordListsPage
 import SettingsPage
 
 
@@ -22,7 +21,7 @@ class Home:
         ctk.CTkButton(self.f_home_options, text='Quiz', font=button_size,
                       command=lambda: self.submission(frame, 'quiz')).grid(column=0, row=0, pady=12, sticky='EW')
         ctk.CTkButton(self.f_home_options, text='Word Lists', font=button_size,
-                      command=lambda: self.submission(frame, 'quiz')).grid(column=0, row=1, pady=12, sticky='EW')
+                      command=lambda: self.submission(frame, 'wl')).grid(column=0, row=1, pady=12, sticky='EW')
         ctk.CTkButton(self.f_home_options, text='Settings', font=button_size,
                       command=lambda: self.submission(frame, 'settings')).grid(column=0, row=2, pady=12, sticky='EW')
 
@@ -34,5 +33,7 @@ class Home:
         if option == 'quiz':
             word_list = QuizManager.select_questions()
             QuizManager.next_question(frame, word_list)
+        elif option == 'wl':
+            WordListsPage.WordListsPage(frame)
         elif option == 'settings':
             SettingsPage.SettingsPage(frame)
