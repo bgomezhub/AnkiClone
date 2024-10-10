@@ -11,11 +11,11 @@ class ConjugationQuizPage:
         # Declare Frames
         self.root_frame = frame
         self.f_question = ctk.CTkFrame(frame)
-        self.f_question.grid(column=0, row=0, padx=200, pady=50)
+        self.f_question.pack(padx=200, pady=50)
         self.f_conjugation_table = ctk.CTkFrame(frame)
-        self.f_conjugation_table.grid(column=0, row=1, padx=200, pady=25)
+        self.f_conjugation_table.pack(padx=200, pady=25)
         self.f_submission = ctk.CTkFrame(frame)
-        self.f_submission.grid(column=0, row=2, padx=200, pady=50)
+        self.f_submission.pack(padx=200, pady=75)
 
         # conjugation
         self.word = word_list[0][word_list[1]][0]

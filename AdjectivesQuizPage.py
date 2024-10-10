@@ -11,11 +11,11 @@ class AdjectivesQuizPage:
         # Table Frame
         self.root_frame = frame
         self.f_question = ctk.CTkFrame(frame)
-        self.f_question.grid(column=0, row=0, padx=200, pady=75)
+        self.f_question.pack(padx=200, pady=75)
         self.f_adj_table = ctk.CTkFrame(frame)
-        self.f_adj_table.grid(column=0, row=1, padx=200, pady=50)
+        self.f_adj_table.pack(padx=210, pady=50)
         self.f_submission = ctk.CTkFrame(frame)
-        self.f_submission.grid(column=0, row=2, padx=200, pady=75)
+        self.f_submission.pack(padx=200, pady=75)
 
         # Adjective
         self.word = word_list[0][word_list[1]][0]
