@@ -1,8 +1,8 @@
-from tkinter import ttk
 import customtkinter as ctk
 import QuizManager
 import Home
 import sqlite3
+import ManageDB
 
 
 class WordListsPage:
@@ -19,12 +19,12 @@ class WordListsPage:
         # Tabview for Word Lists
         self.f_wl_options = ctk.CTkFrame(self.root_frame)
         self.f_wl_options.pack(padx=200, pady=5)
-
         self.tabview = ctk.CTkTabview(self.f_wl_options)
         self.tabview.pack()
         self.tabview.add("Nouns")
         self.tabview.add("Adjectives")
         self.tabview.add("Conjugations")
+
         # Default section
         self.display_nouns()
         self.display_adjs()
@@ -34,7 +34,9 @@ class WordListsPage:
         self.f_submission = ctk.CTkFrame(self.root_frame)
         self.f_submission.pack()
         ctk.CTkButton(self.f_submission, text='Done', font=self.font_body,
-                      command=lambda: self.submission()).grid(column=0, row=0, padx=200, pady=25, sticky='EW')
+                      command=lambda: self.submission()).grid(column=0, row=0, padx=25, pady=25, sticky='EW')
+        ctk.CTkButton(self.f_submission, text='Add', font=self.font_body,
+                      command=lambda: self.add_words_popup()).grid(column=1, row=0, padx=25, pady=25, sticky='EW')
 
     def get_nouns(self):
         # Connect to database
@@ -59,11 +61,7 @@ class WordListsPage:
         # Display column names
         NOUNS_PROPS = ['English', 'French', 'Gender', 'Plural']
         for i in range(0, len(NOUNS_PROPS)):
-            ctk.CTkLabel(f_nouns, text=NOUNS_PROPS[i]).grid(column=i, row = 0, padx=10, pady=10)
-        ctk.CTkLabel(f_nouns, text='English').grid(column=0, row=0, padx=10, pady=10)
-        ctk.CTkLabel(f_nouns, text='French').grid(column=1, row=0, padx=10, pady=10)
-        ctk.CTkLabel(f_nouns, text='Gender').grid(column=2, row=0, padx=10, pady=10)
-        ctk.CTkLabel(f_nouns, text='Plural').grid(column=3, row=0, padx=10, pady=10)
+            ctk.CTkLabel(f_nouns, text=NOUNS_PROPS[i]).grid(column=i, row=0, padx=10, pady=10)
         # Add bar below column names and data
         separator = ctk.CTkFrame(f_nouns, fg_color='#666666', height=3)
         separator.grid(column=0, columnspan=5, row=1, sticky='ew')
@@ -107,7 +105,7 @@ class WordListsPage:
 
         # Add scrollable frame as base of section
         f_adjs = ctk.CTkScrollableFrame(self.tabview.tab("Adjectives"), border_width=3, border_color='#666666')
-        f_adjs.pack(ipadx=90, ipady=50)
+        f_adjs.pack(ipadx=140, ipady=50)
 
         # Display column names
         ADJ_PROPS = ['English', 'Masc. S.', 'Masc. P.', 'Fem. S.', 'Fem. P.']
@@ -165,6 +163,11 @@ class WordListsPage:
             separator = ctk.CTkFrame(f_cons, fg_color='#666666', height=3)
             separator.grid(column=0, columnspan=9, row=i // 8, sticky='ew')
             i += 8
+
+    def add_words_popup(self):
+        w_word_addition = ctk.CTkToplevel(self.root_frame)
+        ManageDB.ManageDB(w_word_addition)
+
 
     def submission(self):
         # destroy all objects of Word Lists page
