@@ -1,16 +1,19 @@
-from tkinter import *
+import customtkinter as ctk
 import sqlite3
+import QuizManager
+
 
 class ManageDB:
-    def __init__(self):
+    def __init__(self, frame):
+        self.body = QuizManager.get_fonts()[0:3:2]
         # Define frames, section->table->recent
-        self.root = Tk()
-        self.section_f = Frame(self.root)
-        self.section_f.grid(column=0, row=0)
-        self.table_f = Frame(self.root)
-        self.table_f.grid(column=0, row=1)
-        self.recent_f = Frame(self.root)
-        self.recent_f.grid(column=0, row=2)
+        self.root = frame
+        self.section_f = ctk.CTkFrame(self.root)
+        self.section_f.pack(pady=5)
+        self.table_f = ctk.CTkFrame(self.root)
+        self.table_f.pack(pady=20)
+        self.recent_f = ctk.CTkFrame(self.root)
+        self.recent_f.pack()
         # Initiate class variables
         self.section()
         self.conjugation_table = []
@@ -21,43 +24,30 @@ class ManageDB:
         self.current_section = 'con'
         self.con_manager(self.current_section)
 
-        self.root.mainloop()
-
     # Display input table for specific section
     def section(self):
-        Button(self.section_f, text="conjugations",
-               command=lambda: self.con_manager(self.current_section)).grid(column=0, row=0, pady=10, sticky='NW')
-        Button(self.section_f, text="nouns",
-               command=lambda: self.nouns_manager(self.current_section)).grid(column=1, row=0, pady=10, sticky='NW')
-        Button(self.section_f, text="adjectives",
-               command=lambda: self.adjs_manager(self.current_section)).grid(column=2, row=0, pady=10, sticky='NW')
+        ctk.CTkButton(self.section_f, text="conjugations",
+                      command=lambda: self.con_manager(self.current_section)).grid(column=0, row=0, padx=1, pady=10)
+        ctk.CTkButton(self.section_f, text="nouns",
+                      command=lambda: self.nouns_manager(self.current_section)).grid(column=1, row=0, padx=1, pady=10)
+        ctk.CTkButton(self.section_f, text="adjectives",
+                      command=lambda: self.adjs_manager(self.current_section)).grid(column=2, row=0, padx=1, pady=10)
 
     def con_manager(self, current_section):
         # Remove current table if not conjugations
-        if current_section == 'nouns':
-            self.reset_manager('nouns', remove=True)
-            self.reset_recent('nouns', remove=True)
-        elif current_section == 'adjs':
-            self.reset_manager('adjs', remove=True)
-            self.reset_recent('adjs', remove=True)
-        else:
-            self.reset_recent('con', remove=True)
+        self.reset_manager(current_section, remove=True)
+        self.reset_recent(current_section, remove=True)
 
         # Update current_section
         self.current_section = 'con'
 
         # Define db manager for conjugations
         con_subjects = ["infinitive en", "infinitive fr", "I", "you", "he/she", "we", "you(formal)", "they"]
-        for num in range(0, 16):
-            if num % 2 == 0:
-                self.conjugation_table.append(Label(self.table_f, text=con_subjects[num//2], pady=8, padx=25))
-                self.conjugation_table[num].grid(column=0, row=num//2)
-            else:
-                self.conjugation_table.append(Entry(self.table_f))
-                self.conjugation_table[num].grid(column=1, row=num//2)
+        QuizManager.build_table(self.table_f, self.body, con_subjects, 16)
+
         # Submission button
-        Button(self.table_f, text="submit",
-               command=lambda: self.sub_con()).grid(columnspan=2, column=0, row=8, pady=10)
+        ctk.CTkButton(self.table_f, text="submit",
+                      command=lambda: self.sub_con()).grid(columnspan=2, column=0, row=8, pady=20)
 
         # Show recent inputs
         self.recent('con')
@@ -65,31 +55,19 @@ class ManageDB:
 
     def nouns_manager(self, current_section):
         # Remove current table if not nouns
-        if current_section == 'con':
-            self.reset_manager('con', remove=True)
-            self.reset_recent('con', remove=True)
-        elif current_section == 'adjs':
-            self.reset_manager('adjs', remove=True)
-            self.reset_recent('adjs', remove=True)
-        else:
-            self.reset_recent('nouns', remove=True)
+        self.reset_manager(current_section, remove=True)
+        self.reset_recent(current_section, remove=True)
 
         # Update current_section
         self.current_section = 'nouns'
 
         # Define db manager for nouns
         nouns_req = ["English", "French", "Gender", "Plural"]
-        for num in range(0, 8):
-            if num % 2 == 0:
-                self.nouns_table.append(Label(self.table_f, text=nouns_req[num//2], pady=8, padx=25))
-                self.nouns_table[num].grid(column=0, row=num//2)
-            else:
-                self.nouns_table.append(Entry(self.table_f))
-                self.nouns_table[num].grid(column=1, row=num // 2)
+        QuizManager.build_table(self.table_f, self.body, nouns_req, 8)
 
         # Submission button
-        Button(self.table_f, text="submit",
-               command=lambda: self.sub_nouns()).grid(columnspan=2, column=0, row=8, pady=10)
+        ctk.CTkButton(self.table_f, text="submit",
+                      command=lambda: self.sub_nouns()).grid(columnspan=2, column=0, row=8, pady=20)
 
         # Show recent inputs
         self.recent('nouns')
@@ -97,31 +75,19 @@ class ManageDB:
 
     def adjs_manager(self, current_section):
         # Remove current table if not adjectives
-        if current_section == 'con':
-            self.reset_manager('con', remove=True)
-            self.reset_recent('con', remove=True)
-        elif current_section == 'nouns':
-            self.reset_manager('nouns', remove=True)
-            self.reset_recent('nouns', remove=True)
-        else:
-            self.reset_recent('adjs', remove=True)
+        self.reset_manager(current_section, remove=True)
+        self.reset_recent(current_section, remove=True)
 
         # Update current_section
         self.current_section = 'adjs'
 
         # Define db manager for nouns
         adjs_req = ["English", "Masc. S.", "Fem. S.", "Masc. P.", "Fem. P."]
-        for num in range(0, 10):
-            if num % 2 == 0:
-                self.adjs_table.append(Label(self.table_f, text=adjs_req[num // 2], pady=8, padx=25))
-                self.adjs_table[num].grid(column=0, row=num // 2)
-            else:
-                self.adjs_table.append(Entry(self.table_f))
-                self.adjs_table[num].grid(column=1, row=num // 2)
+        QuizManager.build_table(self.table_f, self.body, adjs_req, 10)
 
         # Submission button
-        Button(self.table_f, text="submit",
-               command=lambda: self.sub_adjs()).grid(columnspan=2, column=0, row=8, pady=10)
+        ctk.CTkButton(self.table_f, text="submit",
+               command=lambda: self.sub_adjs()).grid(columnspan=2, column=0, row=8, pady=20)
 
         # Show recent inputs
         self.recent('adjs')
@@ -159,18 +125,30 @@ class ManageDB:
         if frame == 'con':
             c.execute("SELECT * FROM present_verb ORDER BY rowid DESC")
         elif frame == 'nouns':
-            c.execute("Select * from nouns ORDER BY rowid DESC")
+            c.execute("Select * from noun ORDER BY rowid DESC")
         else:
-            c.execute("SELECT * FROM adjectives ORDER BY rowid DESC")
+            c.execute("SELECT * FROM adjective ORDER BY rowid DESC")
         # Show recent inputs
         records = c.fetchmany(5)
-        for record in records:
-            Label(self.recent_f, text=record, pady=5, padx=5).pack()
+        ctk.CTkButton(self.recent_f, text=records[0],
+                      command=lambda: self.delete_recent_entry(records[0])).pack(pady=5, padx=5, fill='x')
+        ctk.CTkButton(self.recent_f, text=records[1],
+                      command=lambda: self.delete_recent_entry(records[1])).pack(pady=5, padx=5, fill='x')
+        ctk.CTkButton(self.recent_f, text=records[2],
+                      command=lambda: self.delete_recent_entry(records[2])).pack(pady=5, padx=5, fill='x')
+        ctk.CTkButton(self.recent_f, text=records[3],
+                      command=lambda: self.delete_recent_entry(records[3])).pack(pady=5, padx=5, fill='x')
+        ctk.CTkButton(self.recent_f, text=records[4],
+                      command=lambda: self.delete_recent_entry(records[4])).pack(pady=5, padx=5, fill='x')
 
         # Commit changes and close
         conn.commit()
         conn.close()
         return
+
+    def delete_recent_entry(self, del_entry):
+        return
+
 
     def reset_recent(self, frame, remove=False):
         # Delete & update the recent widget
@@ -226,7 +204,7 @@ class ManageDB:
         # Create cursor
         c = conn.cursor()
         # Insert values into database
-        c.execute("INSERT INTO nouns VALUES (:en, :fr,:gender, :plural)", {
+        c.execute("INSERT INTO noun VALUES (:en, :fr,:gender, :plural)", {
             'en': self.nouns_table[1].get(),
             'fr': self.nouns_table[3].get(),
             'gender': self.nouns_table[5].get(),
@@ -255,7 +233,7 @@ class ManageDB:
         # Create cursor
         c = conn.cursor()
         # Insert values into database
-        c.execute("INSERT INTO adjectives VALUES (:en, :masc,:fem, :mascp, :femp)", {
+        c.execute("INSERT INTO adjective VALUES (:en, :masc,:fem, :mascp, :femp)", {
             'en': self.adjs_table[1].get(),
             'masc': self.adjs_table[3].get(),
             'fem': self.adjs_table[5].get(),
@@ -278,6 +256,3 @@ class ManageDB:
         self.reset_manager('adjs')
 
         return
-
-
-ManageDB()
