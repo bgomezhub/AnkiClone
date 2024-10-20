@@ -34,7 +34,7 @@ class ManageDB:
                       command=lambda: self.adjs_manager(self.current_section)).grid(column=2, row=0, padx=1, pady=10)
 
     def con_manager(self, current_section):
-        # Remove current table if not conjugations
+        # Reset page
         self.reset_manager(current_section, remove=True)
         self.reset_recent(current_section, remove=True)
 
@@ -43,7 +43,7 @@ class ManageDB:
 
         # Define db manager for conjugations
         con_subjects = ["infinitive en", "infinitive fr", "I", "you", "he/she", "we", "you(formal)", "they"]
-        QuizManager.build_table(self.table_f, self.body, con_subjects, 16)
+        self.conjugation_table = QuizManager.build_table(self.table_f, self.body, con_subjects, 16)
 
         # Submission button
         ctk.CTkButton(self.table_f, text="submit",
@@ -54,7 +54,7 @@ class ManageDB:
         return
 
     def nouns_manager(self, current_section):
-        # Remove current table if not nouns
+        # Reset page
         self.reset_manager(current_section, remove=True)
         self.reset_recent(current_section, remove=True)
 
@@ -63,7 +63,7 @@ class ManageDB:
 
         # Define db manager for nouns
         nouns_req = ["English", "French", "Gender", "Plural"]
-        QuizManager.build_table(self.table_f, self.body, nouns_req, 8)
+        self.nouns_table = QuizManager.build_table(self.table_f, self.body, nouns_req, 8)
 
         # Submission button
         ctk.CTkButton(self.table_f, text="submit",
@@ -74,7 +74,7 @@ class ManageDB:
         return
 
     def adjs_manager(self, current_section):
-        # Remove current table if not adjectives
+        # Reset page
         self.reset_manager(current_section, remove=True)
         self.reset_recent(current_section, remove=True)
 
@@ -83,27 +83,30 @@ class ManageDB:
 
         # Define db manager for nouns
         adjs_req = ["English", "Masc. S.", "Fem. S.", "Masc. P.", "Fem. P."]
-        QuizManager.build_table(self.table_f, self.body, adjs_req, 10)
+        self.adjs_table = QuizManager.build_table(self.table_f, self.body, adjs_req, 10)
 
         # Submission button
         ctk.CTkButton(self.table_f, text="submit",
-               command=lambda: self.sub_adjs()).grid(columnspan=2, column=0, row=8, pady=20)
+                      command=lambda: self.sub_adjs()).grid(columnspan=2, column=0, row=8, pady=20)
 
         # Show recent inputs
         self.recent('adjs')
+
         return
 
     # Clear all values for new input
-    def reset_manager(self, frame, remove=False):
+    def reset_manager(self, current_section, remove=False):
         for widget in self.table_f.winfo_children():
             widget.destroy()
 
-        if frame == 'con':
+        # Clear table (list) depending on current section
+        # Load page for section
+        if current_section == 'con':
             self.conjugation_table.clear()
             # If same section replace with itself
             if not remove:
                 self.con_manager(self.current_section)
-        elif frame == 'nouns':
+        elif current_section == 'nouns':
             self.nouns_table.clear()
             # If same section replace with itself
             if not remove:
@@ -147,19 +150,39 @@ class ManageDB:
         return
 
     def delete_recent_entry(self, del_entry):
+        # Connect to database
+        conn = sqlite3.connect('en_fr_words.db')
+        # Create cursor
+        c = conn.cursor()
+        # Get table name
+        table_name = {"adjs": "adjective", "con": "present_verb", "nouns": "noun"}
+        table_name = table_name[self.current_section]
+
+        # Insert values into database
+        # en is the first column of every table that is not word_info
+        c.execute(f"DELETE FROM {table_name} WHERE en = '{del_entry[0]}'")
+        c.execute(f"DELETE FROM word_info WHERE word = '{del_entry[0]}'")
+
+        # Commit changes and close db
+        conn.commit()
+        conn.close()
+
+        self.reset_recent(self.current_section)
+
         return
 
 
-    def reset_recent(self, frame, remove=False):
+    def reset_recent(self, current_section, remove=False):
         # Delete & update the recent widget
         for widget in self.recent_f.winfo_children():
             widget.destroy()
+
         # Display appropriate recent depending on section
-        if frame == 'con' and not remove:
+        if current_section == 'con' and not remove:
             self.recent('con')
-        elif frame == 'nouns' and not remove:
+        elif current_section == 'nouns' and not remove:
             self.recent('nouns')
-        elif frame == 'adjs' and not remove:
+        elif current_section == 'adjs' and not remove:
             self.recent('adjs')
 
         return
@@ -170,9 +193,9 @@ class ManageDB:
         # Create cursor
         c = conn.cursor()
         # Insert values into database
-        c.execute("INSERT INTO present_verb VALUES (:infinitive_en, :infinitive_fr,:i, :you, :he_she, :we, :you_formal, :they)", {
-            'infinitive_en': self.conjugation_table[1].get(),
-            'infinitive_fr': self.conjugation_table[3].get(),
+        c.execute("INSERT INTO present_verb VALUES (:en, :fr,:i, :you, :he_she, :we, :you_formal, :they)", {
+            'en': self.conjugation_table[1].get(),
+            'fr': self.conjugation_table[3].get(),
             'i': self.conjugation_table[5].get(),
             'you': self.conjugation_table[7].get(),
             'he_she': self.conjugation_table[9].get(),
