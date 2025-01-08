@@ -147,6 +147,7 @@ class ManageDB:
         # Commit changes and close
         conn.commit()
         conn.close()
+
         return
 
     def delete_recent_entry(self, del_entry):
@@ -203,13 +204,13 @@ class ManageDB:
             'you_formal': self.conjugation_table[13].get(),
             'they': self.conjugation_table[15].get(),
             })
-        c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :pts_cap, :cooldown)", {
+        c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :cooldown, :pts_cap)", {
             'word': self.conjugation_table[1].get(),
             'type': 'present_verb',
             'new': 1,
             'pts': 0,
-            'pts_cap': 0,
             'cooldown': '20240101',
+            'pts_cap': 0,
         })
 
         # Commit changes and close db
@@ -233,13 +234,13 @@ class ManageDB:
             'gender': self.nouns_table[5].get(),
             'plural': self.nouns_table[7].get(),
             })
-        c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :pts_cap, :cooldown)", {
+        c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :cooldown, :pts_cap)", {
             'word': self.nouns_table[1].get(),
             'type': 'noun',
             'new': 1,
             'pts': 0,
-            'pts_cap': 0,
             'cooldown': '20240101',
+            'pts_cap': 0,
         })
         # Commit changes and close db
         conn.commit()
@@ -263,13 +264,13 @@ class ManageDB:
             'mascp': self.adjs_table[7].get(),
             'femp': self.adjs_table[9].get(),
         })
-        c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :pts_cap, :cooldown)", {
+        c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :cooldown, :pts_cap)", {
             'word': self.adjs_table[1].get(),
             'type': 'adjective',
             'new': 1,
             'pts': 0,
-            'pts_cap': 0,
             'cooldown': '20240101',
+            'pts_cap': 0,
         })
         # Commit changes and close db
         conn.commit()

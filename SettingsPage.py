@@ -77,10 +77,11 @@ class SettingsPage:
         size_entry = ctk.CTkEntry(temp_frame, font=self.font_body, justify='center', width=(self.font_body.cget("size")+ 20))
         size_entry.grid(column=1, row=0)
 
+        size_title = self.font_title.cget("size")
         size_body = self.font_body.cget("size")
         # Input new size into entry
         if font_type == 'title':
-            size_entry.insert(0, self.font_title.cget("size"))
+            size_entry.insert(0, size_title)
         elif font_type == 'body':
             size_entry.insert(0, size_body)
         else:
