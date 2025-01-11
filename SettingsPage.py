@@ -6,31 +6,37 @@ import QuizManager
 
 class SettingsPage:
     def __init__(self, frame):
-        self.root_frame = frame
         # Dynamic Font
         font = QuizManager.get_fonts()
         self.font_title = ctk.CTkFont(family=font[0], size=font[1])
         self.font_body = ctk.CTkFont(family=font[0], size=font[2])
+        # Root Frame
+        self.root_frame = ctk.CTkFrame(frame)
+        self.root_frame.pack(fill='both', expand=True)
+
         # Title
-        self.f_title = ctk.CTkFrame(frame)
-        self.f_title.pack(padx=200, pady=50)
+        self.f_title = ctk.CTkFrame(self.root_frame)
+        self.f_title.pack(fill='y', expand=True)
         self.title = ctk.CTkLabel(self.f_title, text='Settings', font=self.font_title)
-        self.title.pack()
+        self.title.pack(expand=True)
         # Handle Setting Options
-        self.f_setting_options = ctk.CTkFrame(frame)
-        self.f_setting_options.pack(padx=200, pady=25)
+        self.f_setting_options = ctk.CTkFrame(self.root_frame)
+        self.f_setting_options.pack(fill='y', expand=True)
+        self.f_setting_options.rowconfigure(4, weight=1)
+
         self.title_spinbox = self.spinbox('title')
         self.body_spinbox = self.spinbox('body')
         self.daily_spinbox = self.spinbox('daily')
+
         # Submission frame
-        self.f_submission = ctk.CTkFrame(frame)
-        self.f_submission.pack(padx=200)
+        self.f_submission = ctk.CTkFrame(self.root_frame)
+        self.f_submission.pack(fill='y', expand=True)
 
         self.options()
 
         # Return to Home
         ctk.CTkButton(self.f_submission, text='Done', font=self.font_body,
-                      command=lambda: self.submission()).grid(column=0, row=0, sticky='N', pady=25)
+                      command=lambda: self.submission()).pack(expand=True)
 
     def options(self):
         # Open settings
@@ -61,12 +67,8 @@ class SettingsPage:
                                           variable=switch_var)
         appearance_switch.grid(column=2, row=3, pady=11, padx=10, columnspan=2)
 
-        # Add spacing between appearance and color options
-        ctk.CTkLabel(self.f_setting_options, text='', font=self.font_body).grid(column=0, row=4, columnspan=4)
-
         # Set color of program
-        ctk.CTkLabel(self.f_setting_options, text="Color", font=self.font_body).grid(column=0, row=5, columnspan=4)
-        self.color_options()
+        self.color_options().grid(column=0, row=4, columnspan=4)
 
         return
 
@@ -229,6 +231,9 @@ class SettingsPage:
         self.reload_settings_page()
 
     def color_options(self):
+        temp_frame = ctk.CTkFrame(self.f_setting_options)
+        ctk.CTkLabel(temp_frame, text="Color", font=self.font_body).grid(column=0, row=0, columnspan=4)
+
         # Open settings
         with open('settings.json', 'r') as file:
             settings = json.load(file)
@@ -250,23 +255,24 @@ class SettingsPage:
             index = 1
 
         # Should be in a loop. Could not get arguments to send of specific button. All returned info of last button.
-        ctk.CTkButton(self.f_setting_options, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[0]][index], hover=False,
-                      command=lambda: self.set_color(c_o_keys[0], current_color)).grid(column=0, row=6, padx=1, pady=1, sticky='ew')
-        ctk.CTkButton(self.f_setting_options, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[1]][index], hover=False,
-                      command=lambda: self.set_color(c_o_keys[1], current_color)).grid(column=1, row=6, padx=1, pady=1, sticky='ew')
-        ctk.CTkButton(self.f_setting_options, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[2]][index], hover=False,
-                      command=lambda: self.set_color(c_o_keys[2], current_color)).grid(column=2, row=6, padx=1, pady=1, sticky='ew')
-        ctk.CTkButton(self.f_setting_options, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[3]][index], hover=False,
-                      command=lambda: self.set_color(c_o_keys[3], current_color)).grid(column=3, row=6, padx=1, pady=1, sticky='ew')
-        ctk.CTkButton(self.f_setting_options, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[4]][index], hover=False,
-                      command=lambda: self.set_color(c_o_keys[4], current_color)).grid(column=0, row=7, padx=1, pady=1, sticky='ew')
-        ctk.CTkButton(self.f_setting_options, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[5]][index], hover=False,
-                      command=lambda: self.set_color(c_o_keys[5], current_color)).grid(column=1, row=7, padx=1, pady=1, sticky='ew')
-        ctk.CTkButton(self.f_setting_options, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[6]][index], hover=False,
-                      command=lambda: self.set_color(c_o_keys[6], current_color)).grid(column=2, row=7, padx=1, pady=1, sticky='ew')
-        ctk.CTkButton(self.f_setting_options, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[7]][index], hover=False,
-                      command=lambda: self.set_color(c_o_keys[7], current_color)).grid(column=3, row=7, padx=1, pady=1, sticky='ew')
-        return
+        ctk.CTkButton(temp_frame, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[0]][index], hover=False,
+                      command=lambda: self.set_color(c_o_keys[0], current_color)).grid(column=0, row=1, padx=1, pady=1, sticky='ew')
+        ctk.CTkButton(temp_frame, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[1]][index], hover=False,
+                      command=lambda: self.set_color(c_o_keys[1], current_color)).grid(column=1, row=1, padx=1, pady=1, sticky='ew')
+        ctk.CTkButton(temp_frame, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[2]][index], hover=False,
+                      command=lambda: self.set_color(c_o_keys[2], current_color)).grid(column=2, row=1, padx=1, pady=1, sticky='ew')
+        ctk.CTkButton(temp_frame, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[3]][index], hover=False,
+                      command=lambda: self.set_color(c_o_keys[3], current_color)).grid(column=3, row=1, padx=1, pady=1, sticky='ew')
+        ctk.CTkButton(temp_frame, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[4]][index], hover=False,
+                      command=lambda: self.set_color(c_o_keys[4], current_color)).grid(column=0, row=2, padx=1, pady=1, sticky='ew')
+        ctk.CTkButton(temp_frame, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[5]][index], hover=False,
+                      command=lambda: self.set_color(c_o_keys[5], current_color)).grid(column=1, row=2, padx=1, pady=1, sticky='ew')
+        ctk.CTkButton(temp_frame, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[6]][index], hover=False,
+                      command=lambda: self.set_color(c_o_keys[6], current_color)).grid(column=2, row=2, padx=1, pady=1, sticky='ew')
+        ctk.CTkButton(temp_frame, text=' ', font=self.font_body, fg_color=color_options[c_o_keys[7]][index], hover=False,
+                      command=lambda: self.set_color(c_o_keys[7], current_color)).grid(column=3, row=2, padx=1, pady=1, sticky='ew')
+
+        return temp_frame
 
     def set_color(self, new_color, past_color):
         # Save info of last theme
