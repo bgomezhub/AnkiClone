@@ -22,8 +22,9 @@ class NounQuizPage:
 
         # Select noun
         self.word = word_list[0][word_list[1]][0]  # noun index
-        self.is_new = QuizManager.get_new_info(self.word)
-        self.noun = QuizManager.select_word('noun', self.word)
+        self.table = word_list[0][word_list[1]][1]
+        self.is_new = QuizManager.get_new_info(self.word, self.table)
+        self.noun = QuizManager.select_word(self.word, self.table)
 
         # Properties of noun
         self.gen = ctk.StringVar()

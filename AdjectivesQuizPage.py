@@ -19,8 +19,9 @@ class AdjectivesQuizPage:
 
         # Adjective
         self.word = word_list[0][word_list[1]][0]
-        self.is_new = QuizManager.get_new_info(self.word)
-        self.adj = QuizManager.select_word('adjective', self.word)
+        self.table = word_list[0][word_list[1]][1]
+        self.is_new = QuizManager.get_new_info(self.word, self.table)
+        self.adj = QuizManager.select_word(self.word, self.table)
 
         # Define & Display adjective table
         self.adj_table = self.define_adj_table()
