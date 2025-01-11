@@ -25,16 +25,21 @@ def select_questions():
     #word_list = c.fetchmany(2)  # Temporary
 
     # Select due words
-    c.execute(f"Select word, type FROM word_info "
-              f"WHERE cooldown <= {datetime.datetime.now().strftime('%Y%m%d')} AND new = 0")
-    word_list = c.fetchmany(3)
+    '''c.execute(f"Select word, type FROM word_info "
+              f"WHERE cooldown <= {datetime.datetime.now().strftime('%Y%m%d')} AND new = 0")'''
+    c.execute("SELECT word, type FROM word_info "
+              "WHERE word = 'to eat' and type = 'passe_compose'")
+    '''c.execute("SELECT word, type FROM word_info "
+              "WHERE word = 'to speak'")'''
+
+    word_list = c.fetchmany(1)
     print(word_list)
     #word_list += c.fetchall()#
     #word_list = c.fetchall()
     return word_list
 
 
-def select_word(table, word):
+def select_word(word, table):
     # Select all in a list
     # Connect to database
     conn = sqlite3.connect('en_fr_words.db')
@@ -54,12 +59,12 @@ def next_question(frame, word_list):
     # Randomize next word
     rand_index = random.randint(0, len(word_list) - 1)
     # Send to corresponding page
-    if word_list[rand_index][1] == 'present_verb':
-        ConjugationQuizPage.ConjugationQuizPage(frame, [word_list, rand_index])
-    elif word_list[rand_index][1] == 'noun':
+    if word_list[rand_index][1] == 'noun':
         NounQuizPage.NounQuizPage(frame, [word_list, rand_index])
     elif word_list[rand_index][1] == 'adjective':
         AdjectivesQuizPage.AdjectivesQuizPage(frame, [word_list, rand_index])
+    else:
+        ConjugationQuizPage.ConjugationQuizPage(frame, [word_list, rand_index])
 
 
 def remove_question(word_list, remove=True):
@@ -127,6 +132,66 @@ def build_table_new_word(table_frame, font_body, props, widgets_num, word):
     return
 
 
+def build_table_new_word_comp(table_frame, font_body, props, widgets_num, word):
+    print(word)
+    composite_verbs = get_composite_verbs(word)
+    composite_question_table(table_frame, font_body, word, composite_verbs[0]).pack()
+    ctk.CTkLabel(table_frame, text='').pack()
+    ctk.CTkLabel(table_frame, text='').pack()
+    composite_tense_table(table_frame, font_body, props, widgets_num, composite_verbs).pack()
+
+    return
+
+
+def composite_question_table(table_frame, font_body, word, inf_aux):
+    ret_frame = ctk.CTkFrame(table_frame)
+    ctk.CTkLabel(ret_frame, text='Tense', font=font_body, pady=12, padx=25).grid(column=0, row=0)
+    ctk.CTkLabel(ret_frame, text='Auxiliaire', font=font_body, pady=12, padx=25).grid(column=1, row=0)
+    ctk.CTkLabel(ret_frame, text='Participe Passé', font=font_body, pady=12, padx=25).grid(column=2, row=0)
+
+    ttk.Separator(ret_frame, orient='horizontal').grid(columnspan=3, row=1, sticky='ew')
+
+    ctk.CTkLabel(ret_frame, text=word[2].capitalize(), font=font_body, pady=12, padx=25).grid(column=0, row=2)
+    ctk.CTkLabel(ret_frame, text=inf_aux, font=font_body, pady=12, padx=25).grid(column=1, row=2)
+    ctk.CTkLabel(ret_frame, text=word[3], font=font_body, pady=12, padx=25).grid(column=2, row=2)
+
+    return ret_frame
+
+
+def composite_tense_table(table_frame, font_body, props, widgets_num, composite_verbs):
+    ret_frame = ctk.CTkFrame(table_frame)
+    column = 0
+    i = 0
+    for num in range(0, widgets_num):
+        if num % 3 == 0:
+            ctk.CTkLabel(ret_frame, text=props[num // 3], font=font_body, pady=12, padx=25).grid(column=0, row=num)
+        else:
+            ctk.CTkLabel(ret_frame, text=composite_verbs[i], font=font_body, pady=12, padx=25).grid(column=column,
+                                                                                                    row=num - column)
+            i += 1
+
+        column += 1
+        if column % 3 == 0:
+            column = 0
+            ttk.Separator(ret_frame, orient='horizontal').grid(columnspan=3, row=num, sticky='ew')
+
+    return ret_frame
+
+
+def get_composite_verbs(word):
+    inf_participle = select_word(word[0], word[2])[1]
+    aux = select_word(word[1], word[2])
+    past_participle = word[3]
+
+    composite = [aux[1], inf_participle]
+
+    for i in range(2, len(aux)):
+        composite.append(aux[i])
+        composite.append(past_participle)
+
+    return composite
+
+
 def table_feedback(table_frame, font_body, table, word, widgets_num):
     # Open settings for feedback colors dependent on program appearance (light/dark)
     with open("settings.json", 'r') as file:
@@ -137,7 +202,6 @@ def table_feedback(table_frame, font_body, table, word, widgets_num):
         colors = settings["correct_feedback"][0], settings['incorrect_feedback'][0]
     else:
         colors = settings["correct_feedback"][1], settings['incorrect_feedback'][1]
-
 
     grade = 0
     for entry in range(1, widgets_num, 2):
@@ -175,8 +239,9 @@ def next_button(root_frame, font_body, sub_frame, word_list, grade):
 
 
 def submission_new_word(root_frame, font_body, sub_frame, word_list):
-    # Removes word from new
-    set_new_info(word_list[0][word_list[1]][0])
+    word = word_list[0][word_list[1]][0]
+    table = word_list[0][word_list[1]][1]
+    remove_new_from_word(word, table)
 
     # Create button to leave page
     done = ctk.CTkButton(sub_frame, text="Next", font=font_body)
@@ -196,22 +261,22 @@ def get_pts_cap(word):
     return c.fetchone()[0]  # Fetchone returns tuple with a null at end
 
 
-def get_new_info(word):
+def get_new_info(word, table):
     # Connect to database
     conn = sqlite3.connect('en_fr_words.db')
     # Create cursor
     c = conn.cursor()
-    c.execute(f"SELECT new FROM word_info WHERE word = '{word}'")
+    c.execute(f"SELECT new FROM word_info WHERE word = '{word}' and type = '{table}'")
 
     return c.fetchone()[0]  # Fetchone returns tuple with a null at end
 
 
-def set_new_info(word):
+def remove_new_from_word(word, table):
     # Connect to database
     conn = sqlite3.connect('en_fr_words.db')
     # Create cursor
     c = conn.cursor()
-    c.execute(f"UPDATE word_info SET new = 0 WHERE word = '{word}'")
+    c.execute(f"UPDATE word_info SET new = 0 WHERE word = '{word}' and type = '{table}'")
     # Commit changes and close db
     conn.commit()
     conn.close()
