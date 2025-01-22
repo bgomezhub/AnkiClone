@@ -11,7 +11,6 @@ class ConjugationQuizPage:
 
         # Declare Frames
         self.f_page = ctk.CTkScrollableFrame(f_root)
-        # self.f_root = frame
         self.f_page.pack(fill="both", expand=True)
         self.f_question = ctk.CTkFrame(self.f_page)
         self.f_question.pack(pady=50)
