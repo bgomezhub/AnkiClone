@@ -80,9 +80,7 @@ def remove_question(word_list, remove=True):
 
 def get_fonts():
     # Get theme & size info
-    with open("settings.json", 'r') as file:
-        settings = json.load(file)
-    file.close()
+    settings = get_settings()
 
     # Get font family
     with open(f"themes/{settings['color']}.json", 'r') as file:
@@ -98,9 +96,19 @@ def get_fonts():
     return tuple((font_family, font_size_title, font_size_body))
 
 
-def quiz_title(question_frame, font_title, word, new=False):
-    if new:
-        ctk.CTkLabel(question_frame, text="NEW", font=(font_title["family"], font_title["size"] - 10),
+def get_settings():
+    with open("settings.json", 'r') as file:
+        settings = json.load(file)
+    file.close()
+
+    return settings
+
+
+def quiz_title(f_question, font_title, word, table):
+    is_new = get_new_info(word, table)
+
+    if is_new:
+        ctk.CTkLabel(f_question, text="NEW", font=(font_title["family"], font_title["size"] - 10),
                      text_color='red').grid(column=0, row=0, pady=10)
         ctk.CTkLabel(question_frame, text=word, font=font_title).grid(column=0, row=1)
     else:
@@ -178,26 +186,8 @@ def composite_tense_table(table_frame, font_body, props, widgets_num, composite_
     return ret_frame
 
 
-def get_composite_verbs(word):
-    inf_participle = select_word(word[0], word[2])[1]
-    aux = select_word(word[1], word[2])
-    past_participle = word[3]
-
-    composite = [aux[1], inf_participle]
-
-    for i in range(2, len(aux)):
-        composite.append(aux[i])
-        composite.append(past_participle)
-
-    return composite
-
-
-def table_feedback(table_frame, font_body, table, word, widgets_num):
-    # Open settings for feedback colors dependent on program appearance (light/dark)
-    with open("settings.json", 'r') as file:
-        settings = json.load(file)
-    file.close()
-
+def provide_feedback(f_table, font_body, table, responses, word_props, widgets_num):
+    settings = get_settings()
     if settings["appearance"] == 'light':
         colors = settings["correct_feedback"][0], settings['incorrect_feedback'][0]
     else:
