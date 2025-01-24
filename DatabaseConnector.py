@@ -37,17 +37,40 @@ def get_settings():
     return settings
 
 
-def get_pts_cap(word):
+def get_pts_cap(word, table):
     """Returns bool if pts_cap has been triggered."""
     conn = sqlite3.connect('en_fr_words.db')  # Connect to database
     c = conn.cursor()  # Create cursor
-    c.execute(f"SELECT pts_cap FROM word_info WHERE word = '{word}'")
+    c.execute(f"SELECT pts_cap FROM word_info WHERE word = '{word}' AND type = '{table}'")
     pts_cap_value = c.fetchone()[0]
+    conn.close()  # Close db connection
 
     if pts_cap_value == 1:
         return True
     else:
         return False
+
+
+def set_pts_cap(word, table):
+    """Sets pts_cap to True."""
+    conn = sqlite3.connect('en_fr_words.db')  # Connect to database
+    c = conn.cursor()  # Create cursor
+    c.execute(f"UPDATE word_info SET pts_cap = 1 WHERE word = '{word}' AND type = '{table}'")
+
+    conn.commit()  # Commit changes
+    conn.close()  # Close db connection
+    return
+
+
+def remove_pts_cap(word, table):
+    """Sets pts_cap to False."""
+    conn = sqlite3.connect('en_fr_words.db')  # Connect to database
+    c = conn.cursor()  # Create cursor
+    c.execute(f"UPDATE word_info SET pts_cap = 0 WHERE word = '{word}' AND type = '{table}'")
+
+    conn.commit()  # Commit changes
+    conn.close()  # Close db connection
+    return
 
 
 def get_new_info(word, table):
@@ -56,6 +79,7 @@ def get_new_info(word, table):
     c = conn.cursor()  # Create cursor
     c.execute(f"SELECT new FROM word_info WHERE word = '{word}' and type = '{table}'")
     new_value = c.fetchone()[0]
+    conn.close()  # Close db connection
 
     if new_value == 1:
         return True
@@ -74,47 +98,58 @@ def remove_new_from_word(word, table):
     return
 
 
-def set_pts(word, grade):
-    """Updates pts & sets pts_cap."""
+def get_pts(word, table):
+    """Returns pts of selected word"""
+    conn = sqlite3.connect('en_fr_words.db')  # Connect to database
+    c = conn.cursor()  # Create cursor
+    c.execute(f"SELECT pts FROM word_info WHERE word = '{word}' and type = '{table}'")
+    pts = c.fetchone()[0]
+    conn.close()  # Close db connection
+
+    return pts
+
+
+def set_pts(word, table, word_pts, gained_pts):
+    """Adds pts to word_info."""
     conn = sqlite3.connect('en_fr_words.db')  # Connect to database
     c = conn.cursor()  # Create cursor
 
-    pts_gained = grade * 20 - 10  # +- 10 pts, 50% results in 0
-
-    c.execute(f"SELECT pts from word_info WHERE word = '{word}'")
-    word_pts = c.fetchone()[0]
     # pts will not be lost further if at or below zero
-    if not (word_pts <= 0 and pts_gained < 0):
-        c.execute(f"UPDATE word_info SET pts = (pts + {pts_gained}) WHERE word = '{word}'")
-
-    # Set pts_cap
-    c.execute(f"UPDATE word_info SET pts_cap = 1 WHERE word = '{word}'")
+    if not (word_pts <= 0 and gained_pts < 0):
+        c.execute(f"UPDATE word_info SET pts = (pts + {gained_pts}) WHERE word = '{word}' AND type = '{table}'")
 
     conn.commit()  # Commit changes
     conn.close()  # Close db connection
     return
 
 
-def set_cooldown(word):
+def calculate_pts(grade):
+    """Returns pts based of grade of submission."""
+    return grade * 20 - 10  # +- 10 pts, 50% results in 0
+
+
+def update_pts(word, table, grade):
+    """Updates pts & sets pts_cap."""
+    pts_gained = calculate_pts(grade)
+    word_pts = get_pts(word, table)
+    set_pts(word, table, word_pts, pts_gained)
+    set_pts_cap(word, table)
+
+    return
+
+
+def set_cooldown(word, table, date):
     """Sets next review date for word."""
     conn = sqlite3.connect('en_fr_words.db')  # Connect to database
     c = conn.cursor()  # Create cursor
-
-    # Calculate cooldown based off pts
-    c.execute(f"SELECT pts FROM word_info WHERE word = '{word}'")
-    cd = calculate_cooldown(c.fetchone()[0])  # get days until next review
-    cd = datetime.datetime.now() + datetime.timedelta(days=cd)  # Add cooldown to today's date
-    cd = cd.strftime("%Y%m%d")  # format YYYYMMDD
-    # Update Table
-    c.execute(f"UPDATE word_info SET cooldown = '{cd}' WHERE word = '{word}'")
-    c.execute(f"UPDATE word_info set pts_cap = 0 WHERE word = '{word}'")
+    c.execute(f"UPDATE word_info SET cooldown = '{date}' WHERE word = '{word}' AND type = '{table}'")
 
     conn.commit()  # Commit changes
     conn.close()  # Close db connection
     return
 
 
-def calculate_cooldown(pts):
+def calculate_cooldown_days(pts):
     """Returns # of days until next review date."""
     if pts < 15:
         return 1
@@ -132,6 +167,23 @@ def calculate_cooldown(pts):
         return 13
 
 
+def calculate_cooldown_date(days):
+    """Returns the date until next review."""
+    cd = datetime.datetime.now() + datetime.timedelta(days=days)  # Add cooldown to today's date
+    date = cd.strftime("%Y%m%d")  # format YYYYMMDD
+
+    return date
+
+
+def update_cooldown(word, table):
+    """Updates cooldown date & removes pts_cap of word."""
+    pts = get_pts(word, table)
+    days = calculate_cooldown_days(pts)
+    date = calculate_cooldown_date(days)
+    set_cooldown(word, table, date)
+    remove_pts_cap(word, table)
+
+
 def get_composite(table):
     """Returns bool if word is a composite verb."""
     if table in ['passe_compose', 'futur_anterieur', 'plus_que_parfait']:
@@ -142,8 +194,8 @@ def get_composite(table):
 
 def get_composite_verbs(word):
     """Returns alternating list of aux and verb."""
-    infinitive_verb = select_word(word[0], word[2])[1]
-    aux = select_word(word[1], word[2])
+    infinitive_verb = get_word(word[0], word[2])[1]
+    aux = get_word(word[1], word[2])
     past_participle = word[3]
 
     # Add infinitives
@@ -156,7 +208,7 @@ def get_composite_verbs(word):
     return composite
 
 
-def select_questions():
+def get_questions():
     """Returns word list of due & new words."""
     conn = sqlite3.connect('en_fr_words.db')  # Connect to database
     c = conn.cursor()  # Create cursor
@@ -180,15 +232,17 @@ def select_questions():
     print(word_list)
     #word_list += c.fetchall()
 
+    conn.close()  # Close db connection
     return word_list
 
 
-def select_word(word, table):
+def get_word(word, table):
     """Returns word properties of word."""
     conn = sqlite3.connect('en_fr_words.db')  # Connect to database
     c = conn.cursor()  # Create cursor
     c.execute(f"SELECT * FROM {table} WHERE en = '{word}'")
     word_properties = c.fetchone()
+    conn.close()  # Close db connection
 
     return word_properties
 
@@ -216,9 +270,9 @@ def next_question(f_root, word_list):
 def remove_question(word_list, remove_from_word_list=True):
     """Returns word_list with current question unselected or removed."""
     if remove_from_word_list:
-        rand_index = word_list[1]
+        selected_index = word_list[1]
         word_list = word_list[0]
-        word_list.remove(word_list[rand_index])
+        word_list.remove(word_list[selected_index])
     else:
         word_list = word_list[0]
 
