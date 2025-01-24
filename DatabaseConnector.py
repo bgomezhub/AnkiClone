@@ -44,7 +44,10 @@ def get_pts_cap(word):
     c = conn.cursor()
     c.execute(f"SELECT pts_cap FROM word_info WHERE word = '{word}'")
 
-    return c.fetchone()[0]  # Fetchone returns tuple with a null at end
+    if c.fetchone()[0] == 1:
+        return True
+
+    return False
 
 
 def get_new_info(word, table):
@@ -54,7 +57,10 @@ def get_new_info(word, table):
     c = conn.cursor()
     c.execute(f"SELECT new FROM word_info WHERE word = '{word}' and type = '{table}'")
 
-    return c.fetchone()[0]  # Fetchone returns tuple with a null at end
+    if c.fetchone()[0] == 1:
+        return True
+
+    return False
 
 
 def remove_new_from_word(word, table):
@@ -132,9 +138,9 @@ def calculate_cooldown(pts):
 
 def get_composite(table):
     if table in ['passe_compose', 'futur_anterieur', 'plus_que_parfait']:
-        return 1
+        return True
     else:
-        return 0
+        return False
 
 
 def get_composite_verbs(word):
@@ -220,7 +226,3 @@ def remove_question(word_list, remove=True):
         word_list = word_list[0]
 
     return word_list
-
-
-
-

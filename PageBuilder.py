@@ -25,13 +25,13 @@ def build_table(f_table, font_body, word, table, props):
     word_props = DatabaseConnector.select_word(word, table)
     widget_num = get_widget_num(table)
 
-    if is_new == 1:
-        if is_composite == 1:
+    if is_new:
+        if is_composite:
             build_table_new_word_comp(f_table, font_body, props, widget_num, word_props)
         else:
             build_table_new_word(f_table, font_body, props, widget_num, word_props)
     else:
-        if is_composite == 1:
+        if is_composite:
             return build_table_old_word_comp(f_table, font_body)
         else:
             return build_table_old_word(f_table, font_body, props, widget_num)
@@ -140,7 +140,7 @@ def provide_feedback(f_table, font_body, table, responses, word_props, widgets_n
         colors = settings["correct_feedback"][1], settings['incorrect_feedback'][1]
 
     is_composite = DatabaseConnector.get_composite(table)
-    if is_composite == 1:
+    if is_composite:
         grade = composite_question_short_table_feedback(f_table, font_body, responses, word_props, colors)
         composite_tense_table_feedback(f_table, font_body, responses, word_props, colors).grid(columnspan=4, row=4)
         return grade
@@ -264,7 +264,7 @@ def submission_button(f_root, f_submission, font_body, responses, word_list):
 
     is_new = DatabaseConnector.get_new_info(word, table)
 
-    if is_new == 1:
+    if is_new:
         DatabaseConnector.remove_new_from_word(word, table)
         done = ctk.CTkButton(f_submission, text="Next", font=font_body)
         # Does not remove from word list
@@ -290,7 +290,7 @@ def grade_question(f_root, font_body, responses, word_list, submit_button):
 
     grade = provide_feedback(f_table, font_body, table, responses, word_props, widget_num)
 
-    if DatabaseConnector.get_pts_cap(word) == 0:
+    if not DatabaseConnector.get_pts_cap(word):
         # Add pts, set pts cap
         DatabaseConnector.set_pts(word, grade)
 
@@ -299,7 +299,6 @@ def grade_question(f_root, font_body, responses, word_list, submit_button):
     next_button(f_root, font_body, submission_f, word_list, grade)
 
     return
-
 
 
 def get_widget_num(table):
