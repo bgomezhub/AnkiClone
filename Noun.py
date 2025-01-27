@@ -2,13 +2,15 @@ import json
 
 import customtkinter as ctk
 from tkinter import ttk
-import QuizManager
+
+import Model
+import QuizController
 
 
-class NounQuizPage:
+class Noun:
     def __init__(self, frame, word_list):
         # Fonts
-        font = QuizManager.get_fonts()
+        font = Model.get_fonts()
         self.font_title = ctk.CTkFont(family=font[0], size=font[1])
         self.font_body = ctk.CTkFont(family=font[0], size=font[2])
         # Table Frame
@@ -23,8 +25,8 @@ class NounQuizPage:
         # Select noun
         self.word = word_list[0][word_list[1]][0]  # noun index
         self.table = word_list[0][word_list[1]][1]
-        self.is_new = QuizManager.get_new_info(self.word, self.table)
-        self.noun = QuizManager.select_word(self.word, self.table)
+        self.is_new = Model.get_new_info(self.word, self.table)
+        self.noun = Model.get_word(self.word, self.table)
 
         # Properties of noun
         self.gen = ctk.StringVar()
@@ -35,7 +37,7 @@ class NounQuizPage:
             # Define & Display nouns table
             self.define_noun_table_new_word()
             # New word, no pts/cap/cooldown
-            QuizManager.submission_new_word(self.root_frame, self.font_body, self.f_submission, word_list)
+            QuizController.submission_new_word(self.root_frame, self.font_body, self.f_submission, word_list)
         else:
             # Define & Display nouns table
             self.noun_table = []
@@ -48,7 +50,7 @@ class NounQuizPage:
     def define_noun_table(self):
         # Define noun table
         # Define noun
-        QuizManager.quiz_title(self.f_question, self.font_title, self.word)
+        QuizController.quiz_title(self.f_question, self.font_title, self.word)
 
         # Define plurality
         ctk.CTkCheckBox(self.f_noun_table, text="Les", variable=self.plural, font=self.font_body,
@@ -67,7 +69,7 @@ class NounQuizPage:
 
     def define_noun_table_new_word(self):
         # Define noun title
-        QuizManager.quiz_title(self.f_question, self.font_title, self.word, new=True)
+        QuizController.quiz_title(self.f_question, self.font_title, self.word)
 
         # Get plurality from word, no SQL necessary since there is no info to gather.
         if self.noun[-1] == 0:
@@ -154,12 +156,12 @@ class NounQuizPage:
 
         grade = grade/3  # Percentage
         # pts cap has not been hit
-        if QuizManager.get_pts_cap(self.word) == 0:
+        if Model.get_pts_cap(self.word) == 0:
             # Add pts, set pts cap
-            QuizManager.set_pts(self.word, grade)
+            Model.update_pts(self.word, self.table, grade)
 
         # Display Button
         self.submit.destroy()
         # Also handles cooldown
-        QuizManager.next_button(self.root_frame, self.font_body, self.f_submission, word_list, grade)
+        QuizController.next_button(self.root_frame, self.font_body, self.f_submission, word_list, grade)
         return

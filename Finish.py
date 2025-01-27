@@ -1,9 +1,8 @@
 import customtkinter as ctk
-
 import Home
 
 
-class FinishPage:
+class Finish:
     def __init__(self, frame):
         # Title
         self.f_finish_title = ctk.CTkFrame(frame)
@@ -13,11 +12,11 @@ class FinishPage:
         self.f_finish_options = ctk.CTkFrame(frame)
         self.f_finish_options.pack(padx=200, pady=50)
 
-        ctk.CTkButton(self.f_finish_options, text='Quiz',
-               command=lambda: self.leave_page(frame)).grid(column=0, row=0)
+        ctk.CTkButton(self.f_finish_options, text='Quiz', command=lambda: leave_page(frame)).grid(column=0, row=0)
 
-    def leave_page(self, frame):
-        for widget in frame.winfo_children():
-            widget.destroy()
 
-        return Home.Home(frame)
+def leave_page(frame):
+    for widget in frame.winfo_children():
+        widget.destroy()
+
+    return Home.Home(frame)

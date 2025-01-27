@@ -1,13 +1,14 @@
 import json
 import customtkinter as ctk
+
+import Model
 import Home
-import QuizManager
 
 
-class SettingsPage:
+class Settings:
     def __init__(self, frame):
         # Dynamic Font
-        font = QuizManager.get_fonts()
+        font = Model.get_fonts()
         self.font_title = ctk.CTkFont(family=font[0], size=font[1])
         self.font_body = ctk.CTkFont(family=font[0], size=font[2])
         # Root Frame
@@ -317,7 +318,7 @@ class SettingsPage:
         for widget in self.root_frame.winfo_children():
             widget.destroy()
 
-        SettingsPage(self.root_frame)
+        Settings(self.root_frame)
 
         return
 

@@ -3,11 +3,11 @@ import tkinter
 import customtkinter as ctk
 from tkinter import ttk
 
-import DatabaseConnector
+import Model
 
 
 def quiz_title(f_question, font_title, word, table):
-    is_new = DatabaseConnector.get_new_info(word, table)
+    is_new = Model.get_new_info(word, table)
 
     if is_new:
         ctk.CTkLabel(f_question, text="NEW", font=(font_title["family"], font_title["size"] - 10),
@@ -20,9 +20,9 @@ def quiz_title(f_question, font_title, word, table):
 
 
 def build_table(f_table, font_body, word, table, props):
-    is_new = DatabaseConnector.get_new_info(word, table)
-    is_composite = DatabaseConnector.get_composite(table)
-    word_props = DatabaseConnector.select_word(word, table)
+    is_new = Model.get_new_info(word, table)
+    is_composite = Model.get_composite(table)
+    word_props = Model.get_word(word, table)
     widget_num = get_widget_num(table)
 
     if is_new:
@@ -85,7 +85,7 @@ def build_table_new_word(f_table, font_body, props, widgets_num, word_props):
 
 
 def build_table_new_word_comp(f_table, font_body, props, widgets_num, word_props):
-    composite_verbs = DatabaseConnector.get_composite_verbs(word_props)
+    composite_verbs = Model.get_composite_verbs(word_props)
     composite_question_short_table_title(f_table, font_body)
     composite_question_short_table_props(f_table, font_body, word_props, composite_verbs[0])
     ctk.CTkLabel(f_table, text='').grid(columnspan=3, row=3)
@@ -133,13 +133,13 @@ def composite_tense_table(f_table, font_body, props, widgets_num, composite_verb
 
 
 def provide_feedback(f_table, font_body, table, responses, word_props, widgets_num):
-    settings = DatabaseConnector.get_settings()
+    settings = Model.get_settings()
     if settings["appearance"] == 'light':
         colors = settings["correct_feedback"][0], settings['incorrect_feedback'][0]
     else:
         colors = settings["correct_feedback"][1], settings['incorrect_feedback'][1]
 
-    is_composite = DatabaseConnector.get_composite(table)
+    is_composite = Model.get_composite(table)
     if is_composite:
         grade = composite_question_short_table_feedback(f_table, font_body, responses, word_props, colors)
         composite_tense_table_feedback(f_table, font_body, responses, word_props, colors).grid(columnspan=4, row=4)
@@ -180,13 +180,13 @@ def composite_question_short_table_feedback(f_table, font_body, responses, word_
         ctk.CTkLabel(f_table, text=word_props[2].capitalize(), font=font_body, pady=12,
                      padx=25).grid(column=0, row=3, sticky='WE')
     if responses[1].get() == word_props[1]:
-        ctk.CTkLabel(f_table, text=DatabaseConnector.select_word(word_props[1], word_props[2])[1], font=font_body,
+        ctk.CTkLabel(f_table, text=Model.get_word(word_props[1], word_props[2])[1], font=font_body,
                      bg_color=colors[0], pady=12, padx=25).grid(column=1, row=2, sticky='WE')
         grade += 1
     else:
-        ctk.CTkLabel(f_table, text=DatabaseConnector.select_word(responses[1].get(), responses[0].get())[1], font=font_body,
+        ctk.CTkLabel(f_table, text=Model.get_word(responses[1].get(), responses[0].get())[1], font=font_body,
                      bg_color=colors[1], pady=12, padx=25).grid(column=1, row=2, sticky='WE')
-        ctk.CTkLabel(f_table, text=DatabaseConnector.select_word(word_props[1], word_props[2])[1], font=font_body, pady=12,
+        ctk.CTkLabel(f_table, text=Model.get_word(word_props[1], word_props[2])[1], font=font_body, pady=12,
                      padx=25).grid(column=1, row=3, sticky='WE')
     if responses[2].get() == word_props[3]:
         ctk.CTkLabel(f_table, text=word_props[3], font=font_body, bg_color=colors[0], pady=12,
@@ -204,7 +204,7 @@ def composite_tense_table_feedback(f_table, font_body, responses, word_props, co
     f_temp = ctk.CTkFrame(f_table)
     con_subjects = ['Infinitive', 'Je', 'Tu', 'Il/Elle', 'Nous', 'Vous', 'Ils/Elles']
     column = 1
-    aux = DatabaseConnector.select_word(responses[1].get(), responses[0].get())
+    aux = Model.get_word(responses[1].get(), responses[0].get())
     table_height = len(aux)
     for index in range(0, len(con_subjects)):
         ctk.CTkLabel(f_temp, text=con_subjects[index], font=font_body, pady=12, padx=25).grid(column=0, row=index)
@@ -215,7 +215,7 @@ def composite_tense_table_feedback(f_table, font_body, responses, word_props, co
             ctk.CTkLabel(f_temp, text=aux[index], font=font_body, bg_color=colors[1], pady=12, padx=25).grid(column=column,
                                                                                                              row=index, sticky='WE')
         column += 1
-        correct_aux = DatabaseConnector.select_word(word_props[1], word_props[2])
+        correct_aux = Model.get_word(word_props[1], word_props[2])
         for index in range(0, table_height):
             ctk.CTkLabel(f_temp, text=correct_aux[index], font=font_body, pady=12, padx=25).grid(column=column, row=index)
     else:
@@ -247,7 +247,7 @@ def next_button(f_root, font_body, f_submission, word_list, grade):
 
     # 100% remove from list & set next due date
     if grade == 1:
-        DatabaseConnector.update_cooldown(word_list[0][word_list[1]][0])
+        Model.update_cooldown(word_list[0][word_list[1]][0], word_list[0][word_list[1]][1])
         done.configure(command=lambda: reset_quiz_manager(f_root, word_list))
     else:
         # Does not remove from word list
@@ -262,10 +262,10 @@ def submission_button(f_root, f_submission, font_body, responses, word_list):
     word = word_list[0][word_list[1]][0]
     table = word_list[0][word_list[1]][1]
 
-    is_new = DatabaseConnector.get_new_info(word, table)
+    is_new = Model.get_new_info(word, table)
 
     if is_new:
-        DatabaseConnector.remove_new_from_word(word, table)
+        Model.remove_new_from_word(word, table)
         done = ctk.CTkButton(f_submission, text="Next", font=font_body)
         # Does not remove from word list
         done.configure(command=lambda: reset_quiz_manager(f_root, word_list, remove=False))
@@ -285,14 +285,14 @@ def grade_question(f_root, font_body, responses, word_list, submit_button):
     word = word_list[0][word_list[1]][0]
     table = word_list[0][word_list[1]][1]
 
-    word_props = DatabaseConnector.select_word(word, table)
+    word_props = Model.get_word(word, table)
     widget_num = get_widget_num(table)
 
     grade = provide_feedback(f_table, font_body, table, responses, word_props, widget_num)
 
-    if not DatabaseConnector.get_pts_cap(word):
+    if not Model.get_pts_cap(word, table):
         # Add pts, set pts cap
-        DatabaseConnector.set_pts(word, grade)
+        Model.update_pts(word, table, grade)
 
     submit_button.destroy()
 
@@ -319,8 +319,8 @@ def reset_quiz_manager(f_root, word_list, remove=True):
 
     # Remove from list
     if remove:
-        word_list = DatabaseConnector.remove_question(word_list)
+        word_list = Model.remove_question(word_list)
     else:
-        word_list = DatabaseConnector.remove_question(word_list, remove=False)
+        word_list = Model.remove_question(word_list, remove_from_word_list=False)
 
-    return DatabaseConnector.next_question(f_root, word_list)
+    return Model.next_question(f_root, word_list)

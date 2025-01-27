@@ -1,24 +1,25 @@
 import customtkinter as ctk
-import QuizManager
 import Home
 import sqlite3
-import ManageDB
+import ManageWords
+import Model
 
 
-class WordListsPage:
+class WordLists:
     def __init__(self, frame):
         # Fonts
-        font = QuizManager.get_fonts()
+        font = Model.get_fonts()
         self.font_title = ctk.CTkFont(family=font[0], size=font[1])
         self.font_body = ctk.CTkFont(family=font[0], size=font[2])
         # Title
-        self.root_frame = frame
+        self.root_frame = ctk.CTkFrame(frame)
+        self.root_frame.pack(fill='both', expand=True)
         self.f_wl_title = ctk.CTkFrame(self.root_frame)
-        self.f_wl_title.pack(padx=200, pady=25)
+        self.f_wl_title.pack(pady=25)
         ctk.CTkLabel(self.f_wl_title, text='Word Lists', font=self.font_title).pack()
         # Tabview for Word Lists
         self.f_wl_options = ctk.CTkFrame(self.root_frame)
-        self.f_wl_options.pack(padx=200, pady=5)
+        self.f_wl_options.pack(pady=5, fill='both', expand=True)
         self.tabview = ctk.CTkTabview(self.f_wl_options)
         self.tabview.pack()
         self.tabview.add("Nouns")
@@ -56,7 +57,7 @@ class WordListsPage:
 
         # Add scrollable frame as base of section
         f_nouns = ctk.CTkScrollableFrame(self.tabview.tab("Nouns"), border_width=3, border_color='#666666')
-        f_nouns.pack(ipadx=55, ipady=50)
+        f_nouns.pack(fill='both', expand=True)
 
         # Display column names
         NOUNS_PROPS = ['English', 'French', 'Gender', 'Plural']
@@ -105,7 +106,7 @@ class WordListsPage:
 
         # Add scrollable frame as base of section
         f_adjs = ctk.CTkScrollableFrame(self.tabview.tab("Adjectives"), border_width=3, border_color='#666666')
-        f_adjs.pack(ipadx=140, ipady=50)
+        f_adjs.pack(fill='both', expand=True)
 
         # Display column names
         ADJ_PROPS = ['English', 'Masc. S.', 'Masc. P.', 'Fem. S.', 'Fem. P.']
@@ -132,7 +133,7 @@ class WordListsPage:
         # Create cursor
         c = conn.cursor()
         # Select nouns
-        c.execute(f"Select * FROM present_verb")
+        c.execute(f"Select * FROM present")
         con_list = c.fetchall()
 
         return con_list
@@ -144,7 +145,7 @@ class WordListsPage:
 
         # Add scrollable frame as base of section
         f_cons = ctk.CTkScrollableFrame(self.tabview.tab("Conjugations"), border_width=3, border_color='#666666')
-        f_cons.pack(ipadx=280, ipady=50)
+        f_cons.pack(fill='both', expand=True)
 
         # Display column names
         CON_PROPS = ['English', 'Infinitive', 'Je', 'Tu', 'Il/Elle', 'Nous', 'Vous', 'Ils/Elles']
@@ -166,8 +167,7 @@ class WordListsPage:
 
     def add_words_popup(self):
         w_word_addition = ctk.CTkToplevel(self.root_frame)
-        ManageDB.ManageDB(w_word_addition)
-
+        ManageWords.ManageWords(w_word_addition)
 
     def submission(self):
         # destroy all objects of Word Lists page

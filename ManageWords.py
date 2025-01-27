@@ -1,11 +1,12 @@
 import customtkinter as ctk
 import sqlite3
-import QuizManager
+import Model
+import QuizController
 
 
-class ManageDB:
+class ManageWords:
     def __init__(self, frame):
-        self.body = QuizManager.get_fonts()[0:3:2]
+        self.body = Model.get_fonts()[0:3:2]
         # Define frames, section->table->recent
         self.root = frame
         self.section_f = ctk.CTkFrame(self.root)
@@ -43,7 +44,7 @@ class ManageDB:
 
         # Define db manager for conjugations
         con_subjects = ["infinitive en", "infinitive fr", "I", "you", "he/she", "we", "you(formal)", "they"]
-        self.conjugation_table = QuizManager.build_table(self.table_f, self.body, con_subjects, 16)
+        self.conjugation_table = QuizController.build_table(self.table_f, self.body, con_subjects, 16)
 
         # Submission button
         ctk.CTkButton(self.table_f, text="submit",
@@ -63,7 +64,7 @@ class ManageDB:
 
         # Define db manager for nouns
         nouns_req = ["English", "French", "Gender", "Plural"]
-        self.nouns_table = QuizManager.build_table(self.table_f, self.body, nouns_req, 8)
+        self.nouns_table = QuizController.build_table(self.table_f, self.body, nouns_req, 8)
 
         # Submission button
         ctk.CTkButton(self.table_f, text="submit",
@@ -83,7 +84,7 @@ class ManageDB:
 
         # Define db manager for nouns
         adjs_req = ["English", "Masc. S.", "Fem. S.", "Masc. P.", "Fem. P."]
-        self.adjs_table = QuizManager.build_table(self.table_f, self.body, adjs_req, 10)
+        self.adjs_table = QuizController.build_table(self.table_f, self.body, adjs_req, 10)
 
         # Submission button
         ctk.CTkButton(self.table_f, text="submit",
@@ -126,7 +127,7 @@ class ManageDB:
         c = conn.cursor()
         # Select Table
         if frame == 'con':
-            c.execute("SELECT * FROM present_verb ORDER BY rowid DESC")
+            c.execute("SELECT * FROM present ORDER BY rowid DESC")
         elif frame == 'nouns':
             c.execute("Select * from noun ORDER BY rowid DESC")
         else:
@@ -156,7 +157,7 @@ class ManageDB:
         # Create cursor
         c = conn.cursor()
         # Get table name
-        table_name = {"adjs": "adjective", "con": "present_verb", "nouns": "noun"}
+        table_name = {"adjs": "adjective", "con": "indicatif_present", "nouns": "noun"}
         table_name = table_name[self.current_section]
 
         # Insert values into database
@@ -194,7 +195,7 @@ class ManageDB:
         # Create cursor
         c = conn.cursor()
         # Insert values into database
-        c.execute("INSERT INTO present_verb VALUES (:en, :fr,:i, :you, :he_she, :we, :you_formal, :they)", {
+        c.execute("INSERT INTO present VALUES (:en, :fr,:i, :you, :he_she, :we, :you_formal, :they)", {
             'en': self.conjugation_table[1].get(),
             'fr': self.conjugation_table[3].get(),
             'i': self.conjugation_table[5].get(),
@@ -206,7 +207,7 @@ class ManageDB:
             })
         c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :cooldown, :pts_cap)", {
             'word': self.conjugation_table[1].get(),
-            'type': 'present_verb',
+            'type': 'indicatif_present',
             'new': 1,
             'pts': 0,
             'cooldown': '20240101',

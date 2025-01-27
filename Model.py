@@ -5,10 +5,10 @@ import random
 import datetime
 
 # Import quiz Pages
-import ConjugationQuizPage
-import NounQuizPage
-import AdjectivesQuizPage
-import FinishPage
+import Conjugation
+import Noun
+import Adjective
+import Finish
 
 
 def get_fonts():
@@ -208,6 +208,17 @@ def get_composite_verbs(word):
     return composite
 
 
+def get_word(word, table):
+    """Returns word properties of word."""
+    conn = sqlite3.connect('en_fr_words.db')  # Connect to database
+    c = conn.cursor()  # Create cursor
+    c.execute(f"SELECT * FROM {table} WHERE en = '{word}'")
+    word_properties = c.fetchone()
+    conn.close()  # Close db connection
+
+    return word_properties
+
+
 def get_questions():
     """Returns word list of due & new words."""
     conn = sqlite3.connect('en_fr_words.db')  # Connect to database
@@ -236,33 +247,22 @@ def get_questions():
     return word_list
 
 
-def get_word(word, table):
-    """Returns word properties of word."""
-    conn = sqlite3.connect('en_fr_words.db')  # Connect to database
-    c = conn.cursor()  # Create cursor
-    c.execute(f"SELECT * FROM {table} WHERE en = '{word}'")
-    word_properties = c.fetchone()
-    conn.close()  # Close db connection
-
-    return word_properties
-
-
 def next_question(f_root, word_list):
     """Randomizes next question and sends program to page depending on the type of the word."""
     # Base condition
     if len(word_list) == 0:
-        return FinishPage.FinishPage(f_root)
+        return Finish.Finish(f_root)
 
     selected_index = random.randint(0, len(word_list) - 1)  # Randomize next word
     word_table = word_list[selected_index][1]
 
     # Send to corresponding page
     if word_table == 'noun':
-        NounQuizPage.NounQuizPage(f_root, [word_list, selected_index])
+        Noun.Noun(f_root, [word_list, selected_index])
     elif word_table == 'adjective':
-        AdjectivesQuizPage.AdjectivesQuizPage(f_root, [word_list, selected_index])
+        Adjective.Adjective(f_root, [word_list, selected_index])
     else:
-        ConjugationQuizPage.ConjugationQuizPage(f_root, [word_list, selected_index])
+        Conjugation.Conjugation(f_root, [word_list, selected_index])
 
     return
 

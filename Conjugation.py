@@ -1,11 +1,12 @@
 import customtkinter as ctk
-import QuizManager
+import Model
+import QuizController
 
 
-class ConjugationQuizPage:
+class Conjugation:
     def __init__(self, f_root, word_list):
         # Fonts
-        font = QuizManager.get_fonts()
+        font = Model.get_fonts()
         self.font_title = ctk.CTkFont(family=font[0], size=font[1])
         self.font_body = ctk.CTkFont(family=font[0], size=font[2])
 
@@ -26,10 +27,11 @@ class ConjugationQuizPage:
         # Define & Display conjugation table
         self.conjugation_table = self.build_conjugation_table()
         # Define & Display submission button
-        QuizManager.submission_button(self.f_page, self.f_submission, self.font_body, self.conjugation_table, word_list)
+        QuizController.submission_button(self.f_page, self.f_submission, self.font_body, self.conjugation_table,
+                                         word_list)
 
     def build_conjugation_table(self):
         con_subjects = ['Infinitive', 'Je', 'Tu', 'Il/Elle', 'Nous', 'Vous', 'Ils/Elles']
 
-        QuizManager.quiz_title(self.f_question, self.font_title, self.word, self.table)
-        return QuizManager.build_table(self.f_conjugation_table, self.font_body, self.word, self.table, con_subjects)
+        QuizController.quiz_title(self.f_question, self.font_title, self.word, self.table)
+        return QuizController.build_table(self.f_conjugation_table, self.font_body, self.word, self.table, con_subjects)
