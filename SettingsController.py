@@ -1,9 +1,75 @@
 import customtkinter as ctk
 import json
 import Home
+import Model
 import Settings
 
-def spinbox(f_settings_options, font_title, font_body, font_type):
+
+def load_daily_word(f_settings_options, font_body):
+    ctk.CTkLabel(f_settings_options, text="Daily New Word Limit:", font=font_body).grid(column=0, row=0,
+                                                                                        columnspan=2)
+    f_spinbox = spinbox(f_settings_options, font_body)
+    spinbox_assign_attributes(f_spinbox, 'daily')
+    f_spinbox.grid(column=2, row=0, pady=11, columnspan=2)
+
+
+def spinbox(f_settings_options, font_body):
+    """Return a spinbox with no functionality assigned."""
+    font_size = font_body.cget("size")
+    temp_frame = ctk.CTkFrame(f_settings_options)
+
+    size_entry = ctk.CTkEntry(temp_frame, font=font_body, justify='center', width=(font_size + 20))
+    size_entry.grid(column=1, row=0)
+
+    ctk.CTkButton(temp_frame, text="-", font=font_body, width=(font_size + 5)).grid(column=0, row=0)
+    ctk.CTkButton(temp_frame, text="+", font=font_body, width=(font_size + 2)).grid(column=3, row=0)
+
+    return temp_frame
+
+
+def spinbox_assign_attributes(f_spinbox, spinbox_type):
+    widgets = f_spinbox.winfo_children()
+
+    if spinbox_type == 'daily':
+        spinbox_assign_daily(widgets)
+
+
+def spinbox_assign_daily(widgets):
+    """Assigns spinbox with daily word limit functionality."""
+    entry, button_1, button_2 = widgets
+
+    daily_word_limit = Model.get_settings()['daily_word_limit']
+    entry.insert(0, daily_word_limit)
+
+    button_1.configure(command=lambda: spinbox_daily_options(entry, -1))
+    button_2.configure(command=lambda: spinbox_daily_options(entry, 1))
+
+    return
+
+
+def spinbox_daily_options(size_entry, change):
+    """Applies changes based on spinbox button pressed."""
+    if change == -1:
+        size = int(size_entry.get()) - 1  # Decrease
+    else:
+        size = int(size_entry.get()) + 1  # Increase
+
+    save_daily_limit(size)
+    replace_entry_value(size_entry, size)
+
+    return
+
+
+def save_daily_limit(size):
+    """Size is saved to settings.json file."""
+    settings = Model.get_settings()
+    settings['daily_word_limit'] = size
+    Model.set_settings(settings)
+
+    return
+
+
+def spinbox_fonts(f_settings_options, font_body, font_type, font_title):
     # Create frame to house all widgets
     temp_frame = ctk.CTkFrame(f_settings_options)
     # Placed in the middle
@@ -11,27 +77,15 @@ def spinbox(f_settings_options, font_title, font_body, font_type):
                               width=(font_body.cget("size") + 20))
     size_entry.grid(column=1, row=0)
 
-    size_title = font_title.cget("size")
     size_body = font_body.cget("size")
+
     # Input new size into entry
     if font_type == 'title':
+        size_title = font_title.cget("size")
         size_entry.insert(0, size_title)
     elif font_type == 'body':
+        size_body = font_body.cget("size")
         size_entry.insert(0, size_body)
-    else:
-        with open('settings.json', 'r') as file:
-            daily_word_limit = json.load(file)['daily_word_limit']
-        file.close()
-
-        size_entry.insert(0, daily_word_limit)
-        ctk.CTkButton(temp_frame, text="-", font=font_body,
-                      command=lambda: spinbox_daily_options(size_entry, -1),
-                      width=(size_body + 5)).grid(column=0, row=0)
-        ctk.CTkButton(temp_frame, text="+", font=font_body,
-                      command=lambda: spinbox_daily_options(size_entry, 1),
-                      width=(size_body + 2)).grid(column=3, row=0)
-
-        return temp_frame
 
     # Options placed on the sides, (-) == button, (+) == button2
     ctk.CTkButton(temp_frame, text="-", font=font_body,
@@ -42,18 +96,6 @@ def spinbox(f_settings_options, font_title, font_body, font_type):
                   width=(size_body + 2)).grid(column=3, row=0)
 
     return temp_frame
-
-
-def spinbox_daily_options(size_entry, change):
-    if change == -1:
-        size = int(size_entry.get()) - 1  # Decrease
-    else:
-        size = int(size_entry.get()) + 1  # Increase
-
-    # Saves value into daily limit
-    save_daily_limit(size)
-    # Remove current entry value and replace with new limit
-    remove_entry_value(size_entry, size)
 
 
 def spinbox_font_options(font_type, size_entry, change):
@@ -68,16 +110,15 @@ def spinbox_font_options(font_type, size_entry, change):
     if font_type == 'body':
         update_body_values(size)
     # Remove current entry value and replace with new size
-    remove_entry_value(size_entry, size)
+    replace_entry_value(size_entry, size)
 
     return
 
 
 def save_font_size(font_type, size, font_title):
     # Open current theme settings
-    with open("settings.json", 'r') as file:
-        color = json.load(file)['color']
-    file.close()
+    color = Model.get_settings()['color']
+
     with open(f"themes/{color}.json", 'r') as file:
         theme = json.load(file)
     file.close()
@@ -96,21 +137,6 @@ def save_font_size(font_type, size, font_title):
     file.close()
 
     return
-
-
-def save_daily_limit(size):
-    # Open file
-    with open("settings.json", 'r') as file:
-        settings = json.load(file)
-    file.close()
-
-    # Change value
-    settings['daily_word_limit'] = size
-
-    # Write into file
-    with open("settings.json", 'w') as file:
-        json.dump(settings, file, indent=2)
-    file.close()
 
 
 def update_body_values(font_body, daily_spinbox, body_spinbox, title_spinbox, size):
@@ -137,20 +163,18 @@ def update_body_values(font_body, daily_spinbox, body_spinbox, title_spinbox, si
     return
 
 
-def remove_entry_value(entry_w, new_value):
+def replace_entry_value(entry: ctk.CTkEntry, new_value: int) -> None:
     # Remove current value of entry
-    entry_w.delete(0, last_index=ctk.END)
+    entry.delete(0, last_index=ctk.END)
     # Input new size into entry
-    entry_w.insert(0, new_value)
+    entry.insert(0, new_value)
 
     return
 
 
 def set_appearance_mode(switch_var):
     # Open settings
-    with open('settings.json', 'r') as file:
-        settings = json.load(file)
-    file.close()
+    settings = Model.get_settings()
 
     # Change value in settings
     if switch_var.get() == 'on':
@@ -175,9 +199,7 @@ def color_options(f_settings_options, font_body):
     ctk.CTkLabel(temp_frame, text="Color", font=font_body).grid(column=0, row=0, columnspan=4)
 
     # Open settings
-    with open('settings.json', 'r') as file:
-        settings = json.load(file)
-    file.close()
+    settings = Model.get_settings()
 
     current_color = settings['color']
     appearance = settings['appearance']
@@ -247,9 +269,7 @@ def set_color(f_root, new_color, past_color):
     ctk.set_default_color_theme(f"themes/{new_color}.json")
 
     # Set new theme color in settings
-    with open(f"settings.json", 'r') as file:
-        settings = json.load(file)
-    file.close()
+    settings = Model.get_settings()
 
     settings["color"] = new_color
 
@@ -271,6 +291,7 @@ def reload_settings_page(f_root):
 
 
 def submission(f_root):
+    f_root = f_root.master.master
     for widget in f_root.winfo_children():
         widget.destroy()
 

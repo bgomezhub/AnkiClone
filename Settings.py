@@ -23,10 +23,6 @@ class Settings:
         self.f_settings_options.pack(fill='y', expand=True)
         self.f_settings_options.rowconfigure(4, weight=1)
 
-        self.title_spinbox = SettingsController.spinbox('title')
-        self.body_spinbox = SettingsController.spinbox('body')
-        self.daily_spinbox = SettingsController.spinbox('daily')
-
         # Submission frame
         self.f_submission = ctk.CTkFrame(self.f_page)
         self.f_submission.pack(fill='y', expand=True)
@@ -39,13 +35,10 @@ class Settings:
 
 
 def load_options(self, f_settings_options):
-    '''# Set daily new word limit
-    ctk.CTkLabel(f_settings_options, text="Daily New Word Limit:", font=font_body).grid(column=0, row=0,
-                                                                                        columnspan=2)
-    daily_spinbox = spinbox(f_settings_options, 'daily')
-    daily_spinbox.grid(column=2, row=0, pady=11, columnspan=2)
+    # Set daily new word limit
+    SettingsController.load_daily_word(self.f_settings_options, self.font_body)
 
-    # Set font sizes
+    '''# Set font sizes
     ctk.CTkLabel(f_settings_options, text="Title Font:", font=font_body).grid(column=0, row=1, columnspan=2)
     self.title_spinbox.grid(column=2, row=1, pady=11, columnspan=2)
 
