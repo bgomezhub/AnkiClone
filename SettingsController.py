@@ -5,12 +5,30 @@ import Model
 import Settings
 
 
-def load_daily_word(f_settings_options, font_body):
-    ctk.CTkLabel(f_settings_options, text="Daily New Word Limit:", font=font_body).grid(column=0, row=0,
+def load_daily_word(f_settings_options, font_body) -> ctk.CTkFrame:
+    f_temp = ctk.CTkFrame(f_settings_options)
+    ctk.CTkLabel(f_temp, text="Daily New Word Limit:", font=font_body).grid(column=0, row=0,
                                                                                         columnspan=2)
-    f_spinbox = spinbox(f_settings_options, font_body)
-    spinbox_assign_attributes(f_spinbox, 'daily')
+    f_spinbox = spinbox(f_temp, font_body)
+    spinbox_assign_daily(f_spinbox.winfo_children())
     f_spinbox.grid(column=2, row=0, pady=11, columnspan=2)
+
+    return f_temp
+
+
+def load_font_title(f_settings_options, font_title, font_body) -> ctk.CTkFrame:
+    f_temp = ctk.CTkFrame(f_settings_options)
+    ctk.CTkLabel(f_temp, text="Title Font:", font=font_body).grid(column=0, row=0, columnspan=2)
+
+    f_spinbox = spinbox(f_temp, font_body)
+    spinbox_assign_title_font(f_spinbox.winfo_children(), font_title)
+    f_spinbox.grid(column=2, row=0, pady=11, columnspan=2)
+
+    return f_temp
+
+
+def load_font_body(f_settings_options, font_body) -> ctk.CTkFrame:
+    pass
 
 
 def spinbox(f_settings_options, font_body):
@@ -27,13 +45,6 @@ def spinbox(f_settings_options, font_body):
     return temp_frame
 
 
-def spinbox_assign_attributes(f_spinbox, spinbox_type):
-    widgets = f_spinbox.winfo_children()
-
-    if spinbox_type == 'daily':
-        spinbox_assign_daily(widgets)
-
-
 def spinbox_assign_daily(widgets):
     """Assigns spinbox with daily word limit functionality."""
     entry, button_1, button_2 = widgets
@@ -41,23 +52,45 @@ def spinbox_assign_daily(widgets):
     daily_word_limit = Model.get_settings()['daily_word_limit']
     entry.insert(0, daily_word_limit)
 
-    button_1.configure(command=lambda: spinbox_daily_options(entry, -1))
-    button_2.configure(command=lambda: spinbox_daily_options(entry, 1))
+    button_1.configure(command=lambda: spinbox_daily_update(entry, -1))
+    button_2.configure(command=lambda: spinbox_daily_update(entry, 1))
+
+    return
+
+def spinbox_assign_title_font(widgets, font_title):
+    entry, button_1, button_2 = widgets
+
+    title_size = font_title.cget("size")
+    entry.insert(0, title_size)
+
+    button_1.configure(command=lambda: spinbox_font_title_update(entry, -1, font_title))
+    button_2.configure(command=lambda: spinbox_font_title_update(entry, 1, font_title))
 
     return
 
 
-def spinbox_daily_options(size_entry, change):
+def spinbox_daily_update(entry, change):
     """Applies changes based on spinbox button pressed."""
-    if change == -1:
-        size = int(size_entry.get()) - 1  # Decrease
-    else:
-        size = int(size_entry.get()) + 1  # Increase
+    new_size = calculate_new_size(entry, change)
 
-    save_daily_limit(size)
-    replace_entry_value(size_entry, size)
+    save_daily_limit(new_size)
+    replace_entry_value(entry, new_size)
 
     return
+
+def spinbox_font_title_update(entry, change, font_title):
+    new_size = calculate_new_size(entry, change)
+
+    save_font_title_size(new_size)
+    update_font_title(font_title, new_size)
+    replace_entry_value(entry, new_size)
+
+    return
+
+
+def calculate_new_size(entry, change):
+    old_size = int(entry.get())
+    return old_size - 1 if change == -1 else old_size + 1
 
 
 def save_daily_limit(size):
@@ -69,36 +102,22 @@ def save_daily_limit(size):
     return
 
 
-def spinbox_fonts(f_settings_options, font_body, font_type, font_title):
-    # Create frame to house all widgets
-    temp_frame = ctk.CTkFrame(f_settings_options)
-    # Placed in the middle
-    size_entry = ctk.CTkEntry(temp_frame, font=font_body, justify='center',
-                              width=(font_body.cget("size") + 20))
-    size_entry.grid(column=1, row=0)
+def save_font_title_size(new_size):
+    """Font Title size is saved to the current themes/color.json file"""
+    theme = Model.get_theme()
+    theme['CTkFont']['Windows']['title_size'] = new_size
+    Model.set_theme(theme)
 
-    size_body = font_body.cget("size")
-
-    # Input new size into entry
-    if font_type == 'title':
-        size_title = font_title.cget("size")
-        size_entry.insert(0, size_title)
-    elif font_type == 'body':
-        size_body = font_body.cget("size")
-        size_entry.insert(0, size_body)
-
-    # Options placed on the sides, (-) == button, (+) == button2
-    ctk.CTkButton(temp_frame, text="-", font=font_body,
-                  command=lambda: spinbox_font_options(font_type, size_entry, -1),
-                  width=(size_body + 5)).grid(column=0, row=0)
-    ctk.CTkButton(temp_frame, text="+", font=font_body,
-                  command=lambda: spinbox_font_options(font_type, size_entry, 1),
-                  width=(size_body + 2)).grid(column=3, row=0)
-
-    return temp_frame
+    return
 
 
-def spinbox_font_options(font_type, size_entry, change):
+def update_font_title(font_title, size):
+    font_title.configure(size=size)
+
+    return
+
+
+def spinbox_font_options(size_entry, change, font_type):
     if change == -1:
         size = int(size_entry.get()) - 1  # Decrease
     else:
@@ -150,8 +169,7 @@ def update_body_values(font_body, daily_spinbox, body_spinbox, title_spinbox, si
     d_widgets[0].configure(width=(size + 20))
     # body option
     b_widgets = body_spinbox.winfo_children()
-    b_widgets[1].configure(
-        width=(size + 3))  # (-) button is smaller in pixels than (+), scales proportionally for most font sizes
+    b_widgets[1].configure(width=(size + 3))
     b_widgets[2].configure(width=(size + 2))
     b_widgets[0].configure(width=(size + 20))
     # title option
