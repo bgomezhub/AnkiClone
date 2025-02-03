@@ -1,11 +1,9 @@
 import customtkinter as ctk
-import json
 import Home
-
-with open("settings.json", 'r') as file:
-    settings = json.load(file)
+from Model import get_settings
 
 # Define attributes of CTK from settings
+settings = get_settings()
 ctk.set_appearance_mode(settings['appearance'])
 ctk.set_default_color_theme(f"themes/{settings['color']}.json")
 
