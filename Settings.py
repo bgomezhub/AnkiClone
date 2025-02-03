@@ -18,6 +18,8 @@ class Settings:
         self.f_title.pack(fill='y', expand=True)
         self.title = ctk.CTkLabel(self.f_title, text='Settings', font=self.font_title)
         self.title.pack(expand=True)
+        self.title_body_ex = ctk.CTkLabel(self.f_title, text='Font Body Example', font=self.font_body)
+        self.title_body_ex.pack(expand=True)
         # Handle Setting Options
         self.f_settings_options = ctk.CTkFrame(self.f_page)
         self.f_settings_options.pack(fill='y', expand=True)
@@ -39,7 +41,7 @@ class Settings:
 
         # Set font sizes
         SettingsController.load_font_title(self.f_settings_options, self.font_title, self.font_body).grid(column=0, row=1)
-        # SettingsController.load_font_body(self.f_settings_options, self.font_body).grid(column=0, row=2)
+        SettingsController.load_font_body(self.f_settings_options, self.font_body, self.title_body_ex).grid(column=0, row=2)
         '''
         ctk.CTkLabel(f_settings_options, text="Title Font:", font=font_body).grid(column=0, row=1, columnspan=2)
         self.title_spinbox.grid(column=2, row=1, pady=11, columnspan=2)

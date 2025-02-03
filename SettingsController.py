@@ -27,8 +27,15 @@ def load_font_title(f_settings_options, font_title, font_body) -> ctk.CTkFrame:
     return f_temp
 
 
-def load_font_body(f_settings_options, font_body) -> ctk.CTkFrame:
-    pass
+def load_font_body(f_settings_options, font_body, body_ex) -> ctk.CTkFrame:
+    f_temp = ctk.CTkFrame(f_settings_options)
+    ctk.CTkLabel(f_temp, text="Body Font:", font=font_body).grid(column=0, row=0, columnspan=2)
+
+    f_spinbox = spinbox(f_temp, font_body)
+    spinbox_assign_body_font(f_spinbox.winfo_children(), font_body, body_ex)
+    f_spinbox.grid(column=2, row=0, pady=11, columnspan=2)
+
+    return f_temp
 
 
 def spinbox(f_settings_options, font_body):
@@ -69,6 +76,18 @@ def spinbox_assign_title_font(widgets, font_title):
     return
 
 
+def spinbox_assign_body_font(widgets, font_body, body_ex):
+    entry, button_1, button_2 = widgets
+
+    body_size = font_body.cget("size")
+    entry.insert(0, body_size)
+
+    button_1.configure(command=lambda: spinbox_font_body_update(entry, -1, font_body, body_ex))
+    button_2.configure(command=lambda: spinbox_font_body_update(entry, 1, font_body, body_ex))
+
+    return
+
+
 def spinbox_daily_update(entry, change):
     """Applies changes based on spinbox button pressed."""
     new_size = calculate_new_size(entry, change)
@@ -83,6 +102,16 @@ def spinbox_font_title_update(entry, change, font_title):
 
     save_font_title_size(new_size)
     update_font_title(font_title, new_size)
+    replace_entry_value(entry, new_size)
+
+    return
+
+
+def spinbox_font_body_update(entry, change, font_body, body_ex):
+    new_size = calculate_new_size(entry, change)
+
+    save_font_body_size(new_size)
+    update_font_body(body_ex, new_size)
     replace_entry_value(entry, new_size)
 
     return
@@ -111,72 +140,24 @@ def save_font_title_size(new_size):
     return
 
 
+def save_font_body_size(new_size):
+    """Font Title size is saved to the current themes/color.json file"""
+    theme = Model.get_theme()
+    theme['CTkFont']['Windows']['size'] = new_size
+    Model.set_theme(theme)
+
+    return
+
+
 def update_font_title(font_title, size):
     font_title.configure(size=size)
 
     return
 
 
-def spinbox_font_options(size_entry, change, font_type):
-    if change == -1:
-        size = int(size_entry.get()) - 1  # Decrease
-    else:
-        size = int(size_entry.get()) + 1  # Increase
-
-    # Updates title size, writes default_size = size
-    save_font_size(font_type, size)
-    # Updates all body values and spinbox options
-    if font_type == 'body':
-        update_body_values(size)
-    # Remove current entry value and replace with new size
-    replace_entry_value(size_entry, size)
-
-    return
-
-
-def save_font_size(font_type, size, font_title):
-    # Open current theme settings
-    color = Model.get_settings()['color']
-
-    with open(f"themes/{color}.json", 'r') as file:
-        theme = json.load(file)
-    file.close()
-
-    # Change body font size
-    if font_type == 'title':
-        theme['CTkFont']['Windows']['title_size'] = size
-        # Update the title size on this page
-        font_title.configure(size=size)
-    else:
-        theme['CTkFont']['Windows']['size'] = size
-
-    # Write into settings for startup of program
-    with open(f"themes/{color}.json", 'w') as file:
-        json.dump(theme, file, indent=2)
-    file.close()
-
-    return
-
-
-def update_body_values(font_body, daily_spinbox, body_spinbox, title_spinbox, size):
-    # Update font size
-    font_body.configure(size=size)
-    # Update widgets to scale with body font size (Entry to contain number and buttons to be semi-congruent to entry)
-    # Daily option
-    d_widgets = daily_spinbox.winfo_children()
-    d_widgets[1].configure(width=(size + 3))
-    d_widgets[2].configure(width=(size + 2))
-    d_widgets[0].configure(width=(size + 20))
-    # body option
-    b_widgets = body_spinbox.winfo_children()
-    b_widgets[1].configure(width=(size + 3))
-    b_widgets[2].configure(width=(size + 2))
-    b_widgets[0].configure(width=(size + 20))
-    # title option
-    t_widgets = title_spinbox.winfo_children()
-    t_widgets[1].configure(width=(size + 3))
-    t_widgets[2].configure(width=(size + 2))
-    t_widgets[0].configure(width=(size + 20))
+def update_font_body(body_ex, size):
+    font_family = Model.get_fonts()[0]
+    body_ex.configure(font=(font_family, size))
 
     return
 
