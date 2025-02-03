@@ -38,18 +38,26 @@ def load_font_body(f_settings_options, font_body, body_ex) -> ctk.CTkFrame:
     return f_temp
 
 
-def spinbox(f_settings_options, font_body):
+def load_appearance_mode(f_settings_options, font_body):
+    f_temp = ctk.CTkFrame(f_settings_options)
+    ctk.CTkLabel(f_temp, text="Appearance (Dark/Light):").grid(column=0, row=0, columnspan=2)
+    switch_appearance_mode(f_temp, font_body).grid(column=2, row=0, pady=11, columnspan=2)
+
+    return f_temp
+
+
+def spinbox(frame, font_body):
     """Return a spinbox with no functionality assigned."""
     font_size = font_body.cget("size")
-    temp_frame = ctk.CTkFrame(f_settings_options)
+    f_temp = ctk.CTkFrame(frame)
 
-    size_entry = ctk.CTkEntry(temp_frame, font=font_body, justify='center', width=(font_size + 20))
+    size_entry = ctk.CTkEntry(f_temp, font=font_body, justify='center', width=(font_size + 20))
     size_entry.grid(column=1, row=0)
 
-    ctk.CTkButton(temp_frame, text="-", font=font_body, width=(font_size + 5)).grid(column=0, row=0)
-    ctk.CTkButton(temp_frame, text="+", font=font_body, width=(font_size + 2)).grid(column=3, row=0)
+    ctk.CTkButton(f_temp, text="-", font=font_body, width=(font_size + 5)).grid(column=0, row=0)
+    ctk.CTkButton(f_temp, text="+", font=font_body, width=(font_size + 2)).grid(column=3, row=0)
 
-    return temp_frame
+    return f_temp
 
 
 def spinbox_assign_daily(widgets):
@@ -92,7 +100,7 @@ def spinbox_daily_update(entry, change):
     """Applies changes based on spinbox button pressed."""
     new_size = calculate_new_size(entry, change)
 
-    save_daily_limit(new_size)
+    set_daily_limit(new_size)
     replace_entry_value(entry, new_size)
 
     return
@@ -100,7 +108,7 @@ def spinbox_daily_update(entry, change):
 def spinbox_font_title_update(entry, change, font_title):
     new_size = calculate_new_size(entry, change)
 
-    save_font_title_size(new_size)
+    set_font_title_size(new_size)
     update_font_title(font_title, new_size)
     replace_entry_value(entry, new_size)
 
@@ -110,7 +118,7 @@ def spinbox_font_title_update(entry, change, font_title):
 def spinbox_font_body_update(entry, change, font_body, body_ex):
     new_size = calculate_new_size(entry, change)
 
-    save_font_body_size(new_size)
+    set_font_body_size(new_size)
     update_font_body(body_ex, new_size)
     replace_entry_value(entry, new_size)
 
@@ -122,7 +130,7 @@ def calculate_new_size(entry, change):
     return old_size - 1 if change == -1 else old_size + 1
 
 
-def save_daily_limit(size):
+def set_daily_limit(size):
     """Size is saved to settings.json file."""
     settings = Model.get_settings()
     settings['daily_word_limit'] = size
@@ -131,7 +139,7 @@ def save_daily_limit(size):
     return
 
 
-def save_font_title_size(new_size):
+def set_font_title_size(new_size):
     """Font Title size is saved to the current themes/color.json file"""
     theme = Model.get_theme()
     theme['CTkFont']['Windows']['title_size'] = new_size
@@ -140,7 +148,7 @@ def save_font_title_size(new_size):
     return
 
 
-def save_font_body_size(new_size):
+def set_font_body_size(new_size):
     """Font Title size is saved to the current themes/color.json file"""
     theme = Model.get_theme()
     theme['CTkFont']['Windows']['size'] = new_size
@@ -163,34 +171,34 @@ def update_font_body(body_ex, size):
 
 
 def replace_entry_value(entry: ctk.CTkEntry, new_value: int) -> None:
-    # Remove current value of entry
-    entry.delete(0, last_index=ctk.END)
-    # Input new size into entry
-    entry.insert(0, new_value)
+    entry.delete(0, last_index=ctk.END)  # Remove current value of entry
+    entry.insert(0, new_value)  # Input new size into entry
 
     return
 
 
-def set_appearance_mode(switch_var):
-    # Open settings
+def switch_appearance_mode(frame, font_body):
+    f_temp = ctk.CTkFrame(frame)
+    # Set up switch variable
     settings = Model.get_settings()
+    switch_var = ctk.StringVar(value="on") if settings['appearance'] == 'light' else ctk.StringVar(value="off")
 
-    # Change value in settings
-    if switch_var.get() == 'on':
-        settings['appearance'] = 'light'
-    else:
-        settings['appearance'] = 'dark'
+    appearance_switch = ctk.CTkSwitch(f_temp, text='', onvalue='on', offvalue='off',
+    font = font_body, command = lambda: set_appearance_mode(switch_var), variable = switch_var)
+    appearance_switch.pack()
 
-    # Write it into settings.json to be remembered on startup of program
-    with open('settings.json', 'w') as file:
-        json.dump(settings, file, indent=2)
-    file.close()
+    return f_temp
 
-    # Change the appearance now
-    ctk.set_appearance_mode(settings['appearance'])
 
-    # Reload Page (for buttons)
-    reload_settings_page()
+def set_appearance_mode(switch_var):
+    settings = Model.get_settings()
+    settings['appearance'] = 'light' if switch_var.get() == 'on' else 'dark'
+    Model.set_settings(settings)
+
+    ctk.set_appearance_mode(settings['appearance'])  # Change the appearance now
+    # reload_settings_page()  # Reload Page (for buttons)
+
+    return
 
 
 def color_options(f_settings_options, font_body):
