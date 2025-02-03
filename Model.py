@@ -38,9 +38,29 @@ def get_settings():
 
 
 def set_settings(settings_file):
-    """Write into settings file."""
+    """Write into settings.json file."""
     with open("settings.json", 'w') as file:
         json.dump(settings_file, file, indent=2)
+    file.close()
+
+    return
+
+
+def get_theme():
+    """Return the current theme.json file."""
+    color = get_settings()['color']
+    with open(f"themes/{color}.json", 'r') as file:
+        theme = json.load(file)
+    file.close()
+
+    return theme
+
+
+def set_theme(theme_file):
+    """Write into theme.json file."""
+    color = get_settings()['color']
+    with open(f"themes/{color}.json", 'w') as file:
+        json.dump(theme_file, file, indent=2)
     file.close()
 
     return
