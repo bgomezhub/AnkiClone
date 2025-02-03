@@ -37,6 +37,15 @@ def get_settings():
     return settings
 
 
+def set_settings(settings_file):
+    """Write into settings file."""
+    with open("settings.json", 'w') as file:
+        json.dump(settings_file, file, indent=2)
+    file.close()
+
+    return
+
+
 def get_pts_cap(word, table):
     """Returns bool if pts_cap has been triggered."""
     conn = sqlite3.connect('en_fr_words.db')  # Connect to database
