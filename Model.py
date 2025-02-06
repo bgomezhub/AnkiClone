@@ -56,6 +56,15 @@ def get_theme():
     return theme
 
 
+def get_theme_not_current(theme_color):
+    """Return specified theme.json file."""
+    with open(f"themes/{theme_color}.json", 'r') as file:
+        theme = json.load(file)
+    file.close()
+
+    return theme
+
+
 def set_theme(theme_file):
     """Write into theme.json file."""
     color = get_settings()['color']
