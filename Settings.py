@@ -32,7 +32,7 @@ class Settings:
 
         # Return to Home
         ctk.CTkButton(self.f_submission, text='Done', font=self.font_body,
-                      command=lambda: SettingsController.submission(self.f_page)).pack(expand=True)
+                      command=lambda: SettingsController.submission(f_root)).pack(expand=True)
 
 
     def load_options(self):
@@ -44,9 +44,7 @@ class Settings:
         SettingsController.load_font_body(self.f_settings_options, self.font_body, self.title_body_ex).grid(column=0, row=2)
         # Toggle dark/light mode
         SettingsController.load_appearance_mode(self.f_settings_options, self.font_body).grid(column=0, row=3)
-
-        '''
-        # Set color of program
-        SettingsController.color_options().grid(column=0, row=4, columnspan=4)'''
+        # Color of program
+        SettingsController.load_colors(self.f_settings_options, self.font_body).grid(column=0, row=4)
 
         return

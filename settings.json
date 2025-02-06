@@ -1,7 +1,42 @@
 {
   "daily_word_limit": 5,
+  "screen_resolution": "1366x768",
   "appearance": "light",
-  "color": "blue",
+  "color": "pink",
+  "color_options": {
+    "blue": [
+      "#3a7ebf",
+      "#1f538d"
+    ],
+    "cyan": [
+      "#00bbbb",
+      "#00aaaa"
+    ],
+    "green": [
+      "#2CC985",
+      "#2FA572"
+    ],
+    "orange": [
+      "#EE9F00",
+      "#DD9F00"
+    ],
+    "pink": [
+      "#F8486D",
+      "#F04660"
+    ],
+    "purple": [
+      "#682cc9",
+      "#682fa5"
+    ],
+    "red": [
+      "#DD2222",
+      "#DD1616"
+    ],
+    "yellow": [
+      "#CCCC22",
+      "#CCCC0F"
+    ]
+  },
   "correct_feedback": [
     "#AAFFAA",
     "#22AA22"
