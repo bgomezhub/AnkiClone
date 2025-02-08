@@ -10,18 +10,22 @@ class Settings:
         self.font_title = ctk.CTkFont(family=font[0], size=font[1])
         self.font_body = ctk.CTkFont(family=font[0], size=font[2])
         # Root Frame
-        self.f_page = ctk.CTkScrollableFrame(f_root)
+        self.f_page = ctk.CTkFrame(f_root)
         self.f_page.pack(fill='both', expand=True)
 
         # Title frame
         self.f_title = ctk.CTkFrame(self.f_page)
         self.f_title.pack(fill='y', expand=True)
-        self.title = ctk.CTkLabel(self.f_title, text='Settings', font=self.font_title)
-        self.title.pack(expand=True)
-        self.title_body_ex = ctk.CTkLabel(self.f_title, text='Font Body Example', font=self.font_body)
-        self.title_body_ex.pack(expand=True)
+        self.f_title_ws = ctk.CTkFrame(self.f_title)
+        self.f_title_ws.pack(expand=True)
+
+        self.title = ctk.CTkLabel(self.f_title_ws, text='Settings', font=self.font_title)
+        self.title.pack(pady=11)
+        self.title_body_ex = ctk.CTkLabel(self.f_title_ws, text='Font Body Example', font=self.font_body)
+        self.title_body_ex.pack(pady=11)
         # Setting options frame
         self.f_settings_options = ctk.CTkFrame(self.f_page)
+
         self.f_settings_options.pack(fill='y', expand=True)
 
         # Submission frame
@@ -37,14 +41,14 @@ class Settings:
 
     def load_options(self):
         # Set daily new word limit
-        SettingsController.load_daily_word(self.f_settings_options, self.font_body).grid(column=0, row=0)
+        SettingsController.load_daily_word(self.f_settings_options, self.font_body).pack(fill='x', expand=True)
 
         # Set font sizes
-        SettingsController.load_font_title(self.f_settings_options, self.font_title, self.font_body).grid(column=0, row=1)
-        SettingsController.load_font_body(self.f_settings_options, self.font_body, self.title_body_ex).grid(column=0, row=2)
+        SettingsController.load_font_title(self.f_settings_options, self.font_title, self.font_body).pack(fill='x', expand=True)
+        SettingsController.load_font_body(self.f_settings_options, self.font_body, self.title_body_ex).pack(fill='x', expand=True)
         # Toggle dark/light mode
-        SettingsController.load_appearance_mode(self.f_settings_options, self.font_body).grid(column=0, row=3)
+        SettingsController.load_appearance_mode(self.f_settings_options, self.font_body).pack(fill='x', expand=True)
         # Color of program
-        SettingsController.load_colors(self.f_settings_options, self.font_body).grid(column=0, row=4)
+        SettingsController.load_colors(self.f_settings_options, self.font_body).pack(fill='x', expand=True)
 
         return

@@ -7,49 +7,61 @@ import Settings
 
 def load_daily_word(f_settings_options, font_body) -> ctk.CTkFrame:
     f_temp = ctk.CTkFrame(f_settings_options)
-    ctk.CTkLabel(f_temp, text="Daily New Word Limit:", font=font_body).grid(column=0, row=0,
-                                                                                        columnspan=2)
+    f_temp.columnconfigure(1, weight=1)
+    f_temp.rowconfigure(0, weight=1)
+
+    ctk.CTkLabel(f_temp, text="Daily New Word Limit:", font=font_body).grid(column=0, row=0)
     f_spinbox = spinbox(f_temp, font_body)
     spinbox_assign_daily(f_spinbox.winfo_children())
-    f_spinbox.grid(column=2, row=0, pady=11, columnspan=2)
+    f_spinbox.grid(column=1, row=0, pady=11, sticky='e')
 
     return f_temp
 
 
 def load_font_title(f_settings_options, font_title, font_body) -> ctk.CTkFrame:
     f_temp = ctk.CTkFrame(f_settings_options)
-    ctk.CTkLabel(f_temp, text="Title Font:", font=font_body).grid(column=0, row=0, columnspan=2)
+    f_temp.columnconfigure(1, weight=1)
+    f_temp.rowconfigure(0, weight=1)
 
+    ctk.CTkLabel(f_temp, text="Title Font:", font=font_body).grid(column=0, row=0)
     f_spinbox = spinbox(f_temp, font_body)
     spinbox_assign_title_font(f_spinbox.winfo_children(), font_title)
-    f_spinbox.grid(column=2, row=0, pady=11, columnspan=2)
+    f_spinbox.grid(column=1, row=0, pady=11, sticky='e')
 
     return f_temp
 
 
 def load_font_body(f_settings_options, font_body, body_ex) -> ctk.CTkFrame:
     f_temp = ctk.CTkFrame(f_settings_options)
-    ctk.CTkLabel(f_temp, text="Body Font:", font=font_body).grid(column=0, row=0, columnspan=2)
+    f_temp.columnconfigure(1, weight=1)
+    f_temp.rowconfigure(0, weight=1)
 
+    ctk.CTkLabel(f_temp, text="Body Font:", font=font_body).grid(column=0, row=0)
     f_spinbox = spinbox(f_temp, font_body)
     spinbox_assign_body_font(f_spinbox.winfo_children(), font_body, body_ex)
-    f_spinbox.grid(column=2, row=0, pady=11, columnspan=2)
+    f_spinbox.grid(column=1, row=0, pady=11, sticky='e')
 
     return f_temp
 
 
 def load_appearance_mode(f_settings_options, font_body):
     f_temp = ctk.CTkFrame(f_settings_options)
-    ctk.CTkLabel(f_temp, text="Appearance (Dark/Light):").grid(column=0, row=0, columnspan=2)
-    switch_appearance_mode(f_temp, font_body, f_settings_options).grid(column=2, row=0, pady=11, columnspan=2)
+    f_temp.columnconfigure(1, weight=1)
+    f_temp.rowconfigure(0, weight=1)
+
+    ctk.CTkLabel(f_temp, text="Appearance (Dark/Light):", font=font_body).grid(column=0, row=0)
+    switch_appearance_mode(f_temp, font_body, f_settings_options).grid(column=1, row=0, pady=11, sticky='e')
 
     return f_temp
 
 
 def load_colors(f_settings_options, font_body):
     f_temp = ctk.CTkFrame(f_settings_options)
+    f_temp.columnconfigure(0, weight=1)
+    f_temp.rowconfigure(1, weight=1)
+
     ctk.CTkLabel(f_temp, text="Color", font=font_body).grid(column=0, row=0, columnspan=4)
-    color_buttons(f_temp, font_body, f_settings_options).grid(column=0, row=0, columnspan=4)
+    color_buttons(f_temp, font_body, f_settings_options).grid(column=0, row=1, columnspan=4)
 
     return f_temp
 
@@ -192,8 +204,8 @@ def switch_appearance_mode(frame, font_body, f_root):
     settings = Model.get_settings()
     switch_var = ctk.StringVar(value="on") if settings['appearance'] == 'light' else ctk.StringVar(value="off")
 
-    appearance_switch = ctk.CTkSwitch(f_temp, text='', onvalue='on', offvalue='off',
-    font = font_body, command = lambda: set_appearance_mode(switch_var, f_root), variable = switch_var)
+    appearance_switch = ctk.CTkSwitch(f_temp, text='', font=font_body, onvalue='on', offvalue='off',
+                                      command = lambda: set_appearance_mode(switch_var, f_root), variable = switch_var)
     appearance_switch.pack()
 
     return f_temp
@@ -212,6 +224,8 @@ def set_appearance_mode(switch_var, f_root):
 
 def color_buttons(f_settings_options, font_body, f_root):
     f_temp = ctk.CTkFrame(f_settings_options)
+    f_temp.columnconfigure(tuple(range(2)), weight=1)
+    f_temp.rowconfigure(tuple(range(4)), weight=1)
 
     settings = Model.get_settings()
     current_color = settings['color']
@@ -267,7 +281,7 @@ def set_color(new_color,  f_root):
 
 
 def reload_settings_page(f_root):
-    f_root = f_root.master.master.master
+    f_root = f_root.master.master
     for widget in f_root.winfo_children():
         widget.destroy()
 
