@@ -4,7 +4,7 @@ import customtkinter as ctk
 from tkinter import ttk
 
 import Model
-import QuizController
+from controllers import Quiz
 
 
 class Noun:
@@ -37,7 +37,7 @@ class Noun:
             # Define & Display nouns table
             self.define_noun_table_new_word()
             # New word, no pts/cap/cooldown
-            QuizController.submission_new_word(self.root_frame, self.font_body, self.f_submission, word_list)
+            Quiz.submission_new_word(self.root_frame, self.font_body, self.f_submission, word_list)
         else:
             # Define & Display nouns table
             self.noun_table = []
@@ -50,7 +50,7 @@ class Noun:
     def define_noun_table(self):
         # Define noun table
         # Define noun
-        QuizController.quiz_title(self.f_question, self.font_title, self.word)
+        Quiz.quiz_title(self.f_question, self.font_title, self.word)
 
         # Define plurality
         ctk.CTkCheckBox(self.f_noun_table, text="Les", variable=self.plural, font=self.font_body,
@@ -69,7 +69,7 @@ class Noun:
 
     def define_noun_table_new_word(self):
         # Define noun title
-        QuizController.quiz_title(self.f_question, self.font_title, self.word)
+        Quiz.quiz_title(self.f_question, self.font_title, self.word)
 
         # Get plurality from word, no SQL necessary since there is no info to gather.
         if self.noun[-1] == 0:
@@ -96,7 +96,7 @@ class Noun:
     # Submit entries and receive feedback on performance
     def submission(self, word_list):
         # Open settings for feedback colors dependent on program appearance (light/dark)
-        with open("settings.json", 'r') as file:
+        with open("../settings.json", 'r') as file:
             settings = json.load(file)
         file.close()
 
@@ -163,5 +163,5 @@ class Noun:
         # Display Button
         self.submit.destroy()
         # Also handles cooldown
-        QuizController.next_button(self.root_frame, self.font_body, self.f_submission, word_list, grade)
+        Quiz.next_button(self.root_frame, self.font_body, self.f_submission, word_list, grade)
         return

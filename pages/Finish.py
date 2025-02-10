@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import Home
+from pages import Home
 
 
 class Finish:

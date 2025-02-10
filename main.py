@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import Home
+from pages import Home
 from Model import get_settings
 
 # Define attributes of CTK from settings

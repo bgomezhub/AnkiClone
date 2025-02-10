@@ -5,10 +5,8 @@ import random
 import datetime
 
 # Import quiz Pages
-import Conjugation
-import Noun
-import Adjective
-import Finish
+from pages import Finish
+from quiz import Noun, Adjective, Conjugation
 
 
 def get_fonts():

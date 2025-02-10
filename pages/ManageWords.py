@@ -1,7 +1,7 @@
 import customtkinter as ctk
 import sqlite3
 import Model
-import QuizController
+import controllers.Quiz
 
 
 class ManageWords:
@@ -44,7 +44,7 @@ class ManageWords:
 
         # Define db manager for conjugations
         con_subjects = ["infinitive en", "infinitive fr", "I", "you", "he/she", "we", "you(formal)", "they"]
-        self.conjugation_table = QuizController.build_table(self.table_f, self.body, con_subjects, 16)
+        self.conjugation_table = controllers.Quiz.build_table(self.table_f, self.body, con_subjects, 16)
 
         # Submission button
         ctk.CTkButton(self.table_f, text="submit",
@@ -64,7 +64,7 @@ class ManageWords:
 
         # Define db manager for nouns
         nouns_req = ["English", "French", "Gender", "Plural"]
-        self.nouns_table = QuizController.build_table(self.table_f, self.body, nouns_req, 8)
+        self.nouns_table = controllers.Quiz.build_table(self.table_f, self.body, nouns_req, 8)
 
         # Submission button
         ctk.CTkButton(self.table_f, text="submit",
@@ -84,7 +84,7 @@ class ManageWords:
 
         # Define db manager for nouns
         adjs_req = ["English", "Masc. S.", "Fem. S.", "Masc. P.", "Fem. P."]
-        self.adjs_table = QuizController.build_table(self.table_f, self.body, adjs_req, 10)
+        self.adjs_table = controllers.Quiz.build_table(self.table_f, self.body, adjs_req, 10)
 
         # Submission button
         ctk.CTkButton(self.table_f, text="submit",
@@ -122,7 +122,7 @@ class ManageWords:
 
     def recent(self, frame):
         # Connect to database
-        conn = sqlite3.connect('en_fr_words.db')
+        conn = sqlite3.connect('../en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Select Table
@@ -153,7 +153,7 @@ class ManageWords:
 
     def delete_recent_entry(self, del_entry):
         # Connect to database
-        conn = sqlite3.connect('en_fr_words.db')
+        conn = sqlite3.connect('../en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Get table name
@@ -191,7 +191,7 @@ class ManageWords:
 
     def sub_con(self):
         # Connect to database
-        conn = sqlite3.connect('en_fr_words.db')
+        conn = sqlite3.connect('../en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Insert values into database
@@ -225,7 +225,7 @@ class ManageWords:
 
     def sub_nouns(self):
         # Connect to database
-        conn = sqlite3.connect('en_fr_words.db')
+        conn = sqlite3.connect('../en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Insert values into database
@@ -254,7 +254,7 @@ class ManageWords:
 
     def sub_adjs(self):
         # Connect to database
-        conn = sqlite3.connect('en_fr_words.db')
+        conn = sqlite3.connect('../en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Insert values into database

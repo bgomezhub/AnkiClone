@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import Model
-import QuizController
+from controllers import Quiz
 
 
 class Adjective:
@@ -27,11 +27,11 @@ class Adjective:
         # Define & Display adjective table
         self.adj_table = self.build_adj_table()
         # Define & Display submission button
-        QuizController.submission_button(self.f_page, self.f_submission, self.font_body, self.adj_table, word_list)
+        Quiz.submission_button(self.f_page, self.f_submission, self.font_body, self.adj_table, word_list)
 
     def build_adj_table(self):
         # Build table
         adj_props = ['Masculine s.', 'Feminine s.', 'Masculine p.', 'Feminine p.']
 
-        QuizController.quiz_title(self.f_question, self.font_title, self.word, self.table)
-        return QuizController.build_table(self.f_adj_table, self.font_body, self.word, self.table, adj_props)
+        Quiz.quiz_title(self.f_question, self.font_title, self.word, self.table)
+        return Quiz.build_table(self.f_adj_table, self.font_body, self.word, self.table, adj_props)

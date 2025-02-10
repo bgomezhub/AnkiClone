@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import Model
-import QuizController
+from controllers import Quiz
 
 
 class Conjugation:
@@ -27,11 +27,11 @@ class Conjugation:
         # Define & Display conjugation table
         self.conjugation_table = self.build_conjugation_table()
         # Define & Display submission button
-        QuizController.submission_button(self.f_page, self.f_submission, self.font_body, self.conjugation_table,
+        Quiz.submission_button(self.f_page, self.f_submission, self.font_body, self.conjugation_table,
                                          word_list)
 
     def build_conjugation_table(self):
         con_subjects = ['Infinitive', 'Je', 'Tu', 'Il/Elle', 'Nous', 'Vous', 'Ils/Elles']
 
-        QuizController.quiz_title(self.f_question, self.font_title, self.word, self.table)
-        return QuizController.build_table(self.f_conjugation_table, self.font_body, self.word, self.table, con_subjects)
+        Quiz.quiz_title(self.f_question, self.font_title, self.word, self.table)
+        return Quiz.build_table(self.f_conjugation_table, self.font_body, self.word, self.table, con_subjects)

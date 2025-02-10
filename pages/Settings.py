@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import Model
-import SettingsController
+import controllers.Settings
 
 
 class Settings:
@@ -36,19 +36,19 @@ class Settings:
 
         # Return to Home
         ctk.CTkButton(self.f_submission, text='Done', font=self.font_body,
-                      command=lambda: SettingsController.submission(f_root)).pack(expand=True)
+                      command=lambda: controllers.Settings.submission(f_root)).pack(expand=True)
 
 
     def load_options(self):
         # Set daily new word limit
-        SettingsController.load_daily_word(self.f_settings_options, self.font_body).pack(fill='x', expand=True)
+        controllers.Settings.load_daily_word(self.f_settings_options, self.font_body).pack(fill='x', expand=True)
 
         # Set font sizes
-        SettingsController.load_font_title(self.f_settings_options, self.font_title, self.font_body).pack(fill='x', expand=True)
-        SettingsController.load_font_body(self.f_settings_options, self.font_body, self.title_body_ex).pack(fill='x', expand=True)
+        controllers.Settings.load_font_title(self.f_settings_options, self.font_title, self.font_body).pack(fill='x', expand=True)
+        controllers.Settings.load_font_body(self.f_settings_options, self.font_body, self.title_body_ex).pack(fill='x', expand=True)
         # Toggle dark/light mode
-        SettingsController.load_appearance_mode(self.f_settings_options, self.font_body).pack(fill='x', expand=True)
+        controllers.Settings.load_appearance_mode(self.f_settings_options, self.font_body).pack(fill='x', expand=True)
         # Color of program
-        SettingsController.load_colors(self.f_settings_options, self.font_body).pack(fill='x', expand=True)
+        controllers.Settings.load_colors(self.f_settings_options, self.font_body).pack(fill='x', expand=True)
 
         return

@@ -1,8 +1,6 @@
 import customtkinter as ctk
-import json
-import Home
+from pages import Home, Settings
 import Model
-import Settings
 
 
 def load_daily_word(f_settings_options, font_body) -> ctk.CTkFrame:
@@ -110,8 +108,8 @@ def spinbox_assign_body_font(widgets, font_body, body_ex):
     body_size = font_body.cget("size")
     entry.insert(0, body_size)
 
-    button_1.configure(command=lambda: spinbox_font_body_update(entry, -1, font_body, body_ex))
-    button_2.configure(command=lambda: spinbox_font_body_update(entry, 1, font_body, body_ex))
+    button_1.configure(command=lambda: spinbox_font_body_update(entry, -1, body_ex))
+    button_2.configure(command=lambda: spinbox_font_body_update(entry, 1, body_ex))
 
     return
 
@@ -136,7 +134,7 @@ def spinbox_font_title_update(entry, change, font_title):
     return
 
 
-def spinbox_font_body_update(entry, change, font_body, body_ex):
+def spinbox_font_body_update(entry, change, body_ex):
     new_size = calculate_new_size(entry, change)
 
     set_font_body_size(new_size)
@@ -228,7 +226,6 @@ def color_buttons(f_settings_options, font_body, f_root):
     f_temp.rowconfigure(tuple(range(4)), weight=1)
 
     settings = Model.get_settings()
-    current_color = settings['color']
     app_mode = 0 if settings['appearance'] == 'light' else 1
     color_options = settings['color_options']
     c_o_keys = list(color_options.keys())

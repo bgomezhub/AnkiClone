@@ -1,7 +1,6 @@
 import customtkinter as ctk
 import Model
-import WordLists
-import Settings
+from pages import WordLists, Settings
 
 
 class Home:
