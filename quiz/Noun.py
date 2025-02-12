@@ -8,18 +8,19 @@ from controllers import Quiz
 
 
 class Noun:
-    def __init__(self, frame, word_list):
+    def __init__(self, f_root, word_list):
         # Fonts
         font = Model.get_fonts()
         self.font_title = ctk.CTkFont(family=font[0], size=font[1])
         self.font_body = ctk.CTkFont(family=font[0], size=font[2])
         # Table Frame
-        self.root_frame = frame
-        self.f_question = ctk.CTkFrame(frame)
+        self.f_page = ctk.CTkScrollableFrame(f_root)
+        self.f_page.pack(fill='both', expand=True)
+        self.f_question = ctk.CTkFrame(self.f_page)
         self.f_question.pack(padx=200, pady=75)
-        self.f_noun_table = ctk.CTkFrame(frame)
+        self.f_noun_table = ctk.CTkFrame(self.f_page)
         self.f_noun_table.pack(padx=200, pady=50)
-        self.f_submission = ctk.CTkFrame(frame)
+        self.f_submission = ctk.CTkFrame(self.f_page)
         self.f_submission.pack(padx=200, pady=75)
 
         # Select noun
@@ -32,15 +33,16 @@ class Noun:
         self.gen = ctk.StringVar()
         self.plural = ctk.IntVar()
 
+        self.noun_table = []
+
         # Display new word or none new word
         if self.is_new == 1:
             # Define & Display nouns table
             self.define_noun_table_new_word()
             # New word, no pts/cap/cooldown
-            Quiz.submission_new_word(self.root_frame, self.font_body, self.f_submission, word_list)
+            Quiz.submission_button(self.f_page, self.f_submission, self.font_body, self.noun_table, word_list)
         else:
             # Define & Display nouns table
-            self.noun_table = []
             self.define_noun_table()
             # Submission
             self.submit = ctk.CTkButton(self.f_submission, text="Submit", font=self.font_body,
@@ -50,7 +52,7 @@ class Noun:
     def define_noun_table(self):
         # Define noun table
         # Define noun
-        Quiz.quiz_title(self.f_question, self.font_title, self.word)
+        Quiz.quiz_title(self.f_question, self.font_title, self.word, self.table)
 
         # Define plurality
         ctk.CTkCheckBox(self.f_noun_table, text="Les", variable=self.plural, font=self.font_body,
@@ -69,7 +71,7 @@ class Noun:
 
     def define_noun_table_new_word(self):
         # Define noun title
-        Quiz.quiz_title(self.f_question, self.font_title, self.word)
+        Quiz.quiz_title(self.f_question, self.font_title, self.word, self.table)
 
         # Get plurality from word, no SQL necessary since there is no info to gather.
         if self.noun[-1] == 0:
@@ -96,7 +98,7 @@ class Noun:
     # Submit entries and receive feedback on performance
     def submission(self, word_list):
         # Open settings for feedback colors dependent on program appearance (light/dark)
-        with open("../settings.json", 'r') as file:
+        with open("./settings.json", 'r') as file:
             settings = json.load(file)
         file.close()
 
@@ -156,12 +158,12 @@ class Noun:
 
         grade = grade/3  # Percentage
         # pts cap has not been hit
-        if Model.get_pts_cap(self.word) == 0:
+        if Model.get_pts_cap(self.word, self.table) == 0:
             # Add pts, set pts cap
             Model.update_pts(self.word, self.table, grade)
 
         # Display Button
         self.submit.destroy()
         # Also handles cooldown
-        Quiz.next_button(self.root_frame, self.font_body, self.f_submission, word_list, grade)
+        Quiz.next_button(self.f_page, self.font_body, self.f_submission, word_list, grade)
         return
