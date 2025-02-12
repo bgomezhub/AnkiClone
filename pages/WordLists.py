@@ -41,7 +41,7 @@ class WordLists:
 
     def get_nouns(self):
         # Connect to database
-        conn = sqlite3.connect('../en_fr_words.db')
+        conn = sqlite3.connect('./en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Select nouns
@@ -90,7 +90,7 @@ class WordLists:
 
     def get_adjs(self):
         # Connect to database
-        conn = sqlite3.connect('../en_fr_words.db')
+        conn = sqlite3.connect('./en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Select nouns
@@ -129,7 +129,7 @@ class WordLists:
 
     def get_conjugations(self):
         # Connect to database
-        conn = sqlite3.connect('../en_fr_words.db')
+        conn = sqlite3.connect('./en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Select nouns

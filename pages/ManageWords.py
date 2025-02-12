@@ -6,15 +6,15 @@ import controllers.Quiz
 
 class ManageWords:
     def __init__(self, frame):
-        self.body = Model.get_fonts()[0:3:2]
+        self.font_body = Model.get_fonts()[0:3:2]
         # Define frames, section->table->recent
         self.root = frame
-        self.section_f = ctk.CTkFrame(self.root)
-        self.section_f.pack(pady=5)
-        self.table_f = ctk.CTkFrame(self.root)
-        self.table_f.pack(pady=20)
-        self.recent_f = ctk.CTkFrame(self.root)
-        self.recent_f.pack()
+        self.f_section = ctk.CTkFrame(self.root)
+        self.f_section.pack(pady=5)
+        self.f_table = ctk.CTkFrame(self.root)
+        self.f_table.pack(pady=20)
+        self.f_recent = ctk.CTkFrame(self.root)
+        self.f_recent.pack()
         # Initiate class variables
         self.section()
         self.conjugation_table = []
@@ -27,11 +27,11 @@ class ManageWords:
 
     # Display input table for specific section
     def section(self):
-        ctk.CTkButton(self.section_f, text="conjugations",
+        ctk.CTkButton(self.f_section, text="conjugations",
                       command=lambda: self.con_manager(self.current_section)).grid(column=0, row=0, padx=1, pady=10)
-        ctk.CTkButton(self.section_f, text="nouns",
+        ctk.CTkButton(self.f_section, text="nouns",
                       command=lambda: self.nouns_manager(self.current_section)).grid(column=1, row=0, padx=1, pady=10)
-        ctk.CTkButton(self.section_f, text="adjectives",
+        ctk.CTkButton(self.f_section, text="adjectives",
                       command=lambda: self.adjs_manager(self.current_section)).grid(column=2, row=0, padx=1, pady=10)
 
     def con_manager(self, current_section):
@@ -44,10 +44,10 @@ class ManageWords:
 
         # Define db manager for conjugations
         con_subjects = ["infinitive en", "infinitive fr", "I", "you", "he/she", "we", "you(formal)", "they"]
-        self.conjugation_table = controllers.Quiz.build_table(self.table_f, self.body, con_subjects, 16)
+        self.conjugation_table = controllers.Quiz.build_table_old_word(self.f_table, self.font_body, con_subjects, 16)
 
         # Submission button
-        ctk.CTkButton(self.table_f, text="submit",
+        ctk.CTkButton(self.f_table, text="submit",
                       command=lambda: self.sub_con()).grid(columnspan=2, column=0, row=8, pady=20)
 
         # Show recent inputs
@@ -64,10 +64,10 @@ class ManageWords:
 
         # Define db manager for nouns
         nouns_req = ["English", "French", "Gender", "Plural"]
-        self.nouns_table = controllers.Quiz.build_table(self.table_f, self.body, nouns_req, 8)
+        self.nouns_table = controllers.Quiz.build_table_old_word(self.f_table, self.font_body, nouns_req, 8)
 
         # Submission button
-        ctk.CTkButton(self.table_f, text="submit",
+        ctk.CTkButton(self.f_table, text="submit",
                       command=lambda: self.sub_nouns()).grid(columnspan=2, column=0, row=8, pady=20)
 
         # Show recent inputs
@@ -84,10 +84,10 @@ class ManageWords:
 
         # Define db manager for nouns
         adjs_req = ["English", "Masc. S.", "Fem. S.", "Masc. P.", "Fem. P."]
-        self.adjs_table = controllers.Quiz.build_table(self.table_f, self.body, adjs_req, 10)
+        self.adjs_table = controllers.Quiz.build_table_old_word(self.f_table, self.font_body, adjs_req, 10)
 
         # Submission button
-        ctk.CTkButton(self.table_f, text="submit",
+        ctk.CTkButton(self.f_table, text="submit",
                       command=lambda: self.sub_adjs()).grid(columnspan=2, column=0, row=8, pady=20)
 
         # Show recent inputs
@@ -97,7 +97,7 @@ class ManageWords:
 
     # Clear all values for new input
     def reset_manager(self, current_section, remove=False):
-        for widget in self.table_f.winfo_children():
+        for widget in self.f_table.winfo_children():
             widget.destroy()
 
         # Clear table (list) depending on current section
@@ -122,7 +122,7 @@ class ManageWords:
 
     def recent(self, frame):
         # Connect to database
-        conn = sqlite3.connect('../en_fr_words.db')
+        conn = sqlite3.connect('./en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Select Table
@@ -134,15 +134,15 @@ class ManageWords:
             c.execute("SELECT * FROM adjective ORDER BY rowid DESC")
         # Show recent inputs
         records = c.fetchmany(5)
-        ctk.CTkButton(self.recent_f, text=records[0],
+        ctk.CTkButton(self.f_recent, text=records[0],
                       command=lambda: self.delete_recent_entry(records[0])).pack(pady=5, padx=5, fill='x')
-        ctk.CTkButton(self.recent_f, text=records[1],
+        ctk.CTkButton(self.f_recent, text=records[1],
                       command=lambda: self.delete_recent_entry(records[1])).pack(pady=5, padx=5, fill='x')
-        ctk.CTkButton(self.recent_f, text=records[2],
+        ctk.CTkButton(self.f_recent, text=records[2],
                       command=lambda: self.delete_recent_entry(records[2])).pack(pady=5, padx=5, fill='x')
-        ctk.CTkButton(self.recent_f, text=records[3],
+        ctk.CTkButton(self.f_recent, text=records[3],
                       command=lambda: self.delete_recent_entry(records[3])).pack(pady=5, padx=5, fill='x')
-        ctk.CTkButton(self.recent_f, text=records[4],
+        ctk.CTkButton(self.f_recent, text=records[4],
                       command=lambda: self.delete_recent_entry(records[4])).pack(pady=5, padx=5, fill='x')
 
         # Commit changes and close
@@ -153,7 +153,7 @@ class ManageWords:
 
     def delete_recent_entry(self, del_entry):
         # Connect to database
-        conn = sqlite3.connect('../en_fr_words.db')
+        conn = sqlite3.connect('./en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Get table name
@@ -176,7 +176,7 @@ class ManageWords:
 
     def reset_recent(self, current_section, remove=False):
         # Delete & update the recent widget
-        for widget in self.recent_f.winfo_children():
+        for widget in self.f_recent.winfo_children():
             widget.destroy()
 
         # Display appropriate recent depending on section
@@ -191,7 +191,7 @@ class ManageWords:
 
     def sub_con(self):
         # Connect to database
-        conn = sqlite3.connect('../en_fr_words.db')
+        conn = sqlite3.connect('./en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Insert values into database
@@ -225,7 +225,7 @@ class ManageWords:
 
     def sub_nouns(self):
         # Connect to database
-        conn = sqlite3.connect('../en_fr_words.db')
+        conn = sqlite3.connect('./en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Insert values into database
@@ -254,7 +254,7 @@ class ManageWords:
 
     def sub_adjs(self):
         # Connect to database
-        conn = sqlite3.connect('../en_fr_words.db')
+        conn = sqlite3.connect('./en_fr_words.db')
         # Create cursor
         c = conn.cursor()
         # Insert values into database
