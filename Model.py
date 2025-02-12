@@ -81,10 +81,7 @@ def get_pts_cap(word, table):
     pts_cap_value = c.fetchone()[0]
     conn.close()  # Close db connection
 
-    if pts_cap_value == 1:
-        return True
-    else:
-        return False
+    return pts_cap_value == 1
 
 
 def set_pts_cap(word, table):
@@ -117,10 +114,7 @@ def get_new_info(word, table):
     new_value = c.fetchone()[0]
     conn.close()  # Close db connection
 
-    if new_value == 1:
-        return True
-    else:
-        return False
+    return new_value == 1
 
 
 def remove_new_from_word(word, table):
@@ -222,10 +216,7 @@ def update_cooldown(word, table):
 
 def get_composite(table):
     """Returns bool if word is a composite verb."""
-    if table in ['passe_compose', 'futur_anterieur', 'plus_que_parfait']:
-        return True
-    else:
-        return False
+    return table in ['passe_compose', 'futur_anterieur', 'plus_que_parfait']
 
 
 def get_composite_verbs(word):
@@ -242,6 +233,11 @@ def get_composite_verbs(word):
         composite.append(past_participle)
 
     return composite
+
+
+def get_noun(table):
+    """Returns bool if word is a noun."""
+    return table == 'noun'
 
 
 def get_word(word, table):
@@ -268,12 +264,12 @@ def get_questions():
     # Select due words
     '''c.execute(f"Select word, type FROM word_info "
               f"WHERE cooldown <= {datetime.datetime.now().strftime('%Y%m%d')} AND new = 0")'''
-    '''c.execute("SELECT word, type FROM word_info "
-              "WHERE word = 'to eat' and type = 'passe_compose'")'''
+    c.execute("SELECT word, type FROM word_info "
+              "WHERE word = 'to eat' and type = 'passe_compose'")
     '''c.execute("SELECT word, type FROM word_info "
               "WHERE word = 'to speak'")'''
-    c.execute("SELECT word, type FROM word_info "
-                  "WHERE word = 'big, tall'")
+    '''c.execute("SELECT word, type FROM word_info "
+                  "WHERE word = 'big, tall'")'''
 
     word_list = c.fetchmany(1)
     print(word_list)
