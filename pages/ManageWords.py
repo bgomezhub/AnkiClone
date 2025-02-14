@@ -1,3 +1,4 @@
+import tkinter
 import customtkinter as ctk
 import sqlite3
 import Model
@@ -27,11 +28,11 @@ class ManageWords:
 
     # Display input table for specific section
     def section(self):
-        ctk.CTkButton(self.f_section, text="conjugations",
+        ctk.CTkButton(self.f_section, text="Conjugations",
                       command=lambda: self.con_manager(self.current_section)).grid(column=0, row=0, padx=1, pady=10)
-        ctk.CTkButton(self.f_section, text="nouns",
+        ctk.CTkButton(self.f_section, text="Nouns",
                       command=lambda: self.nouns_manager(self.current_section)).grid(column=1, row=0, padx=1, pady=10)
-        ctk.CTkButton(self.f_section, text="adjectives",
+        ctk.CTkButton(self.f_section, text="Adjectives",
                       command=lambda: self.adjs_manager(self.current_section)).grid(column=2, row=0, padx=1, pady=10)
 
     def con_manager(self, current_section):
@@ -63,8 +64,21 @@ class ManageWords:
         self.current_section = 'nouns'
 
         # Define db manager for nouns
-        nouns_req = ["English", "French", "Gender", "Plural"]
-        self.nouns_table = controllers.Quiz.build_table_old_word(self.f_table, self.font_body, nouns_req, 8)
+        nouns_req = ["English", "French"]
+        self.nouns_table = controllers.Quiz.build_table_old_word(self.f_table, self.font_body, nouns_req, 4)[1::2]
+        gender = tkinter.StringVar(value='le')
+        plural = tkinter.IntVar(value=0)
+
+        self.nouns_table.append(gender)
+        self.nouns_table.append(plural)
+
+        ctk.CTkLabel(self.f_table, text="Gender").grid(column=0, row=3, padx=1, pady=10)
+        ctk.CTkRadioButton(self.f_table, font=self.font_body, text="Le", variable=gender, value='le').grid(column=1, row=3, padx=1, pady=10)
+        ctk.CTkRadioButton(self.f_table, font=self.font_body, text="La", variable=gender, value='la').grid(column=2, row=3, padx=1, pady=10)
+
+        ctk.CTkLabel(self.f_table, text="Plural").grid(column=0, row=4, padx=1, pady=10)
+        ctk.CTkRadioButton(self.f_table, font=self.font_body, text="No", variable=plural, value=0).grid(column=1, row=4, padx=1, pady=10)
+        ctk.CTkRadioButton(self.f_table, font=self.font_body, text="Yes", variable=plural, value=1).grid(column=2, row=4, padx=1, pady=10)
 
         # Submission button
         ctk.CTkButton(self.f_table, text="submit",
@@ -145,8 +159,6 @@ class ManageWords:
         ctk.CTkButton(self.f_recent, text=records[4],
                       command=lambda: self.delete_recent_entry(records[4])).pack(pady=5, padx=5, fill='x')
 
-        # Commit changes and close
-        conn.commit()
         conn.close()
 
         return
@@ -157,7 +169,7 @@ class ManageWords:
         # Create cursor
         c = conn.cursor()
         # Get table name
-        table_name = {"adjs": "adjective", "con": "indicatif_present", "nouns": "noun"}
+        table_name = {"adjs": "adjective", "con": "present", "nouns": "noun"}
         table_name = table_name[self.current_section]
 
         # Insert values into database
@@ -230,10 +242,10 @@ class ManageWords:
         c = conn.cursor()
         # Insert values into database
         c.execute("INSERT INTO noun VALUES (:en, :fr,:gender, :plural)", {
-            'en': self.nouns_table[1].get(),
-            'fr': self.nouns_table[3].get(),
-            'gender': self.nouns_table[5].get(),
-            'plural': self.nouns_table[7].get(),
+            'en': self.nouns_table[0].get(),
+            'fr': self.nouns_table[1].get(),
+            'gender': self.nouns_table[2].get(),
+            'plural': self.nouns_table[3].get(),
             })
         c.execute("INSERT INTO word_info VALUES (:word, :type, :new, :pts, :cooldown, :pts_cap)", {
             'word': self.nouns_table[1].get(),
