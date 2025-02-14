@@ -40,16 +40,15 @@ def build_table(f_table, font_body, word, table, props):
 
 
 def build_table_old_word(f_table, font_body, subjects, widgets_num):
-    table = []
+    quiz_entries = []
     for num in range(0, widgets_num):
         if num % 2 == 0:
-            table.append(ctk.CTkLabel(f_table, text=subjects[num // 2], font=font_body, pady=12, padx=25))
-            table[num].grid(column=0, row=num // 2)
+            ctk.CTkLabel(f_table, text=subjects[num // 2], font=font_body, pady=12, padx=25).grid(column=0, row=num // 2)
         else:
-            table.append(ctk.CTkEntry(f_table, font=font_body))
-            table[num].grid(column=1, row=num // 2)
+            quiz_entries.append(ctk.CTkEntry(f_table, font=font_body))
+            quiz_entries[num // 2].grid(column=1, row=num // 2)
 
-    return table
+    return quiz_entries
 
 
 def build_table_old_word_comp(f_table, font_body):
@@ -132,7 +131,7 @@ def composite_tense_table(f_table, font_body, props, widgets_num, composite_verb
     return f_return
 
 
-def provide_feedback(f_table, font_body, table, responses, word_props, widgets_num):
+def provide_feedback(f_table, font_body, table, responses, word_props):
     settings = Model.get_settings()
     if settings["appearance"] == 'light':
         colors = settings["correct_feedback"][0], settings['incorrect_feedback'][0]
@@ -145,26 +144,27 @@ def provide_feedback(f_table, font_body, table, responses, word_props, widgets_n
         composite_tense_table_feedback(f_table, font_body, responses, word_props, colors).grid(columnspan=4, row=4)
         return grade
     else:
-        return table_feedback(f_table, font_body, responses, word_props, widgets_num, colors)
+        return table_feedback(f_table, font_body, responses, word_props, colors)
 
 
-def table_feedback(f_table, font_body, table, word, widgets_num, colors):
+def table_feedback(f_table, font_body, responses, word, colors):
     grade = 0
-    for entry in range(1, widgets_num, 2):
-        if table[entry].get() == word[-(-entry // 2)]:
+    word = word[1::]  # Remove first index
+    for index, entry in enumerate(responses):
+        if entry.get() == word[index]:
             # Correct
-            feedback = ctk.CTkLabel(f_table, text=table[entry].get(), font=font_body, padx=25, pady=12, bg_color=colors[0])
+            feedback = ctk.CTkLabel(f_table, text=entry.get(), font=font_body, padx=25, pady=12, bg_color=colors[0])
             grade += 1
         else:
             # Incorrect
-            feedback = ctk.CTkLabel(f_table, text=table[entry].get(), font=font_body, padx=25, pady=12, bg_color=colors[1])
+            feedback = ctk.CTkLabel(f_table, text=entry.get(), font=font_body, padx=25, pady=12, bg_color=colors[1])
             # Correct Label
-            ctk.CTkLabel(f_table, text=word[-(-entry // 2)], font=font_body, padx=25, pady=12).grid(column=3, row=entry // 2)
+            ctk.CTkLabel(f_table, text=word[index], font=font_body, padx=25, pady=12).grid(column=3, row=index)
         # Delete Entry to replace with feedback label
-        table[entry].destroy()
-        feedback.grid(column=1, row=(entry // 2), sticky='WE')  # 'we' fills area of feedback with color
+        entry.destroy()
+        feedback.grid(column=1, row=index, sticky='WE')  # 'we' fills area of feedback with color
 
-    return grade/(widgets_num/2)  # percentage
+    return grade/(len(responses))  # percentage
 
 
 def composite_question_short_table_feedback(f_table, font_body, responses, word_props, colors):
@@ -286,9 +286,8 @@ def grade_question(f_root, font_body, responses, word_list, submit_button):
     table = word_list[0][word_list[1]][1]
 
     word_props = Model.get_word(word, table)
-    widget_num = get_widget_num(table)
 
-    grade = provide_feedback(f_table, font_body, table, responses, word_props, widget_num)
+    grade = provide_feedback(f_table, font_body, table, responses, word_props)
 
     if not Model.get_pts_cap(word, table):
         # Add pts, set pts cap

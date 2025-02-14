@@ -25,9 +25,9 @@ class Conjugation:
         self.table = word_list[0][word_list[1]][1]
 
         # Define & Display conjugation table
-        self.conjugation_table = self.build_conjugation_table()
+        self.quiz_entries = self.build_conjugation_table()
         # Define & Display submission button
-        Quiz.submission_button(self.f_page, self.f_submission, self.font_body, self.conjugation_table,
+        Quiz.submission_button(self.f_page, self.f_submission, self.font_body, self.quiz_entries,
                                          word_list)
 
     def build_conjugation_table(self):

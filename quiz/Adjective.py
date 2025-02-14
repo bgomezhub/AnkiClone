@@ -25,9 +25,9 @@ class Adjective:
         self.table = word_list[0][word_list[1]][1]
 
         # Define & Display adjective table
-        self.adj_table = self.build_adj_table()
+        self.quiz_entries = self.build_adj_table()
         # Define & Display submission button
-        Quiz.submission_button(self.f_page, self.f_submission, self.font_body, self.adj_table, word_list)
+        Quiz.submission_button(self.f_page, self.f_submission, self.font_body, self.quiz_entries, word_list)
 
     def build_adj_table(self):
         # Build table
